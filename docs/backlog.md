@@ -62,7 +62,7 @@ Unsafe parallel work:
 | OS-007 | Investigation, study, and assay API module             | Completed locally | M          | Strongly coupled |
 | OS-008 | Event and audit model                                  | Completed locally | L          | Strongly coupled |
 | OS-009 | Welfare and environmental rule engine                  | Completed locally | M          | Weakly coupled   |
-| OS-010 | ISA-JSON export skeleton                               | Pending           | M          | Weakly coupled   |
+| OS-010 | ISA-JSON export skeleton                               | Completed locally | M          | Weakly coupled   |
 | OS-011 | Connector interfaces and Metadatapp connector skeleton | Pending           | M          | Weakly coupled   |
 | OS-012 | QR token and scan workflow skeleton                    | Pending           | M          | Weakly coupled   |
 | OS-013 | Web app shell and navigation                           | Pending           | M          | Strongly coupled |
@@ -370,6 +370,17 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: High.
 - Token-optimization strategy: Define a narrow exported shape with explicit limitations; avoid full ISA standard coverage in MVP.
+- Branch: `feat/OS-010-isa-json-export`.
+- Validation performed:
+  - `pnpm --filter @cohos/domain build`
+  - `pnpm --filter @cohos/isa typecheck`
+  - `pnpm --filter @cohos/isa build`
+  - `pnpm test -- packages/isa/src/index.test.ts`
+  - Full root validation before PR
+  - Forbidden legacy name scan
+- Validation result: Passed local ISA focused validation and full root validation.
+- Risks: Export shape is an ISA-like skeleton rather than complete ISA-JSON conformance; ISA-Tab, RO-Crate, JSON-LD, and broad ontology normalization remain deferred and documented.
+- Review result: Self-review passed locally; subagent review was unavailable due account usage limits.
 
 ### OS-011: Connector interfaces and Metadatapp connector skeleton
 
