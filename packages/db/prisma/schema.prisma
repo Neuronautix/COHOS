@@ -1,0 +1,654 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SubjectProfileType {
+  human
+  rodent
+  zebrafish_batch
+  farm_animal
+  generic
+}
+
+enum SubjectStatus {
+  active
+  inactive
+  deceased
+  archived
+}
+
+enum HousingUnitType {
+  cage
+  tank
+  pasture
+  pen
+  room
+  other
+}
+
+enum EventType {
+  transfer
+  mortality
+  welfare_observation
+  environmental_observation
+}
+
+enum RequestStatus {
+  draft
+  submitted
+  approved
+  rejected
+  cancelled
+}
+
+enum ApprovalDecision {
+  approved
+  rejected
+}
+
+enum TaskStatus {
+  open
+  in_progress
+  done
+  cancelled
+}
+
+enum AlertSeverity {
+  info
+  warning
+  critical
+}
+
+enum QRTokenPurpose {
+  subject_lookup
+  housing_lookup
+  quick_action
+}
+
+model Organization {
+  id                   String                  @id
+  name                 String
+  slug                 String                  @unique
+  users                User[]
+  roles                Role[]
+  species              Species[]
+  subjects             Subject[]
+  cohorts              Cohort[]
+  facilities           Facility[]
+  investigations       Investigation[]
+  events               Event[]
+  auditEvents          AuditEvent[]
+  requests             Request[]
+  tasks                Task[]
+  alerts               Alert[]
+  connectedLinks       ConnectedResourceLink[]
+  connectorCredentials ConnectorCredential[]
+  qrTokens             QRToken[]
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+}
+
+model User {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  displayName    String
+  roles          UserRole[]
+  recordedEvents Event[]      @relation("RecordedEvents")
+  auditEvents    AuditEvent[]
+  requests       Request[]
+  approvals      Approval[]
+  tasks          Task[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+}
+
+model Role {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  permissions    String[]
+  users          UserRole[]
+  createdAt      DateTime     @default(now())
+
+  @@unique([organizationId, name])
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model Species {
+  id                   String                  @id
+  organizationId       String
+  organization         Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  commonName           String
+  scientificName       String
+  ncbiTaxonId          String?
+  subjects             Subject[]
+  lines                Line[]
+  strains              Strain[]
+  rodentProfiles       RodentSubjectProfile[]
+  zebrafishProfiles    ZebrafishBatchProfile[]
+  farmAnimalProfiles   FarmAnimalProfile[]
+  genericProfiles      GenericSubjectProfile[]
+  createdAt            DateTime                @default(now())
+
+  @@index([organizationId])
+  @@index([ncbiTaxonId])
+}
+
+model Line {
+  id          String                  @id
+  speciesId   String
+  species     Species                 @relation(fields: [speciesId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  rodents     RodentSubjectProfile[]
+  zebrafish   ZebrafishBatchProfile[]
+
+  @@index([speciesId])
+}
+
+model Strain {
+  id        String                 @id
+  speciesId String
+  species   Species                @relation(fields: [speciesId], references: [id], onDelete: Cascade)
+  name      String
+  source    String?
+  rodents   RodentSubjectProfile[]
+
+  @@index([speciesId])
+}
+
+model Genotype {
+  id          String                  @id
+  name        String
+  description String?
+  rodents     RodentSubjectProfile[]
+  zebrafish   ZebrafishBatchProfile[]
+}
+
+model Subject {
+  id                String                  @id
+  organizationId    String
+  organization      Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  subjectCode       String
+  profileType       SubjectProfileType
+  status            SubjectStatus           @default(active)
+  speciesId         String?
+  species           Species?                @relation(fields: [speciesId], references: [id])
+  cohortId          String?
+  cohort            Cohort?                 @relation(fields: [cohortId], references: [id])
+  subjectProfile    SubjectProfile?
+  humanProfile      HumanSubjectProfile?
+  rodentProfile     RodentSubjectProfile?
+  zebrafishProfile  ZebrafishBatchProfile?
+  farmAnimalProfile FarmAnimalProfile?
+  genericProfile    GenericSubjectProfile?
+  events            Event[]
+  samples           Sample[]
+  studySubjects     StudySubject[]
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+
+  @@unique([organizationId, subjectCode])
+  @@index([organizationId, profileType])
+  @@index([cohortId])
+  @@index([speciesId])
+}
+
+model SubjectProfile {
+  id          String             @id
+  subjectId   String             @unique
+  subject     Subject            @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  profileType SubjectProfileType
+  data        Json
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model HumanSubjectProfile {
+  id                       String   @id
+  subjectId                String   @unique
+  subject                  Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  pseudonymizedSubjectCode String   @unique
+  consentStatus            String
+  studyParticipationStatus String
+  ageBand                  String?
+  sex                      String?
+  genderIdentity           String?
+}
+
+model RodentSubjectProfile {
+  id            String       @id
+  subjectId     String       @unique
+  subject       Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  speciesId     String
+  species       Species      @relation(fields: [speciesId], references: [id])
+  strainId      String?
+  strain        Strain?      @relation(fields: [strainId], references: [id])
+  lineId        String?
+  line          Line?        @relation(fields: [lineId], references: [id])
+  genotypeId    String?
+  genotype      Genotype?    @relation(fields: [genotypeId], references: [id])
+  sex           String
+  dateOfBirth   DateTime?
+  ageDays       Int?
+  housingUnitId String?
+  housingUnit   HousingUnit? @relation(fields: [housingUnitId], references: [id])
+  welfareStatus String
+
+  @@index([speciesId])
+  @@index([housingUnitId])
+}
+
+model ZebrafishBatchProfile {
+  id                 String       @id
+  subjectId          String       @unique
+  subject            Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  speciesId          String
+  species            Species      @relation(fields: [speciesId], references: [id])
+  batchIdentifier    String
+  lineId             String?
+  line               Line?        @relation(fields: [lineId], references: [id])
+  genotypeId         String?
+  genotype           Genotype?    @relation(fields: [genotypeId], references: [id])
+  developmentalStage String
+  tankId             String?
+  tank               HousingUnit? @relation(fields: [tankId], references: [id])
+  count              Int
+
+  @@unique([speciesId, batchIdentifier])
+  @@index([tankId])
+}
+
+model FarmAnimalProfile {
+  id                   String       @id
+  subjectId            String       @unique
+  subject              Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  speciesId            String
+  species              Species      @relation(fields: [speciesId], references: [id])
+  groupIdentifier      String
+  individualIdentifier String?
+  birthDate            DateTime?
+  ageDescription       String?
+  sex                  String
+  housingUnitId        String?
+  housingUnit          HousingUnit? @relation(fields: [housingUnitId], references: [id])
+  welfareStatus        String
+
+  @@index([speciesId])
+  @@index([housingUnitId])
+}
+
+model GenericSubjectProfile {
+  id                 String   @id
+  subjectId          String   @unique
+  subject            Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  speciesId          String?
+  species            Species? @relation(fields: [speciesId], references: [id])
+  biologicalType     String
+  metadata           Json
+  extensibilityNotes String?
+}
+
+model Cohort {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  subjects       Subject[]
+  studyCohorts   StudyCohort[]
+
+  @@unique([organizationId, name])
+}
+
+model Facility {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  code           String
+  rooms          Room[]
+
+  @@unique([organizationId, code])
+}
+
+model Room {
+  id           String        @id
+  facilityId   String
+  facility     Facility      @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  name         String
+  code         String
+  racks        Rack[]
+  housingUnits HousingUnit[]
+
+  @@unique([facilityId, code])
+}
+
+model Rack {
+  id           String        @id
+  roomId       String
+  room         Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  name         String
+  code         String
+  housingUnits HousingUnit[]
+
+  @@unique([roomId, code])
+}
+
+model HousingUnit {
+  id                      String                  @id
+  roomId                  String
+  room                    Room                    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  rackId                  String?
+  rack                    Rack?                   @relation(fields: [rackId], references: [id])
+  type                    HousingUnitType
+  name                    String
+  code                    String
+  cage                    Cage?
+  tank                    Tank?
+  rodentProfiles          RodentSubjectProfile[]
+  zebrafishBatchProfiles  ZebrafishBatchProfile[]
+  farmAnimalProfiles      FarmAnimalProfile[]
+  events                  Event[]
+  transferEventsFrom      TransferEvent[]         @relation("TransferFromHousing")
+  transferEventsTo        TransferEvent[]         @relation("TransferToHousing")
+
+  @@unique([roomId, code])
+  @@index([rackId])
+}
+
+model Cage {
+  id            String      @id
+  housingUnitId String      @unique
+  housingUnit   HousingUnit @relation(fields: [housingUnitId], references: [id], onDelete: Cascade)
+  cageType      String?
+}
+
+model Tank {
+  id            String      @id
+  housingUnitId String      @unique
+  housingUnit   HousingUnit @relation(fields: [housingUnitId], references: [id], onDelete: Cascade)
+  volumeLiters  Decimal?
+}
+
+model Investigation {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?
+  startsOn       DateTime?
+  endsOn         DateTime?
+  studies        Study[]
+
+  @@index([organizationId])
+}
+
+model Study {
+  id              String         @id
+  investigationId String
+  investigation   Investigation  @relation(fields: [investigationId], references: [id], onDelete: Cascade)
+  title           String
+  description     String?
+  subjects        StudySubject[]
+  cohorts         StudyCohort[]
+  assays          Assay[]
+
+  @@index([investigationId])
+}
+
+model StudySubject {
+  studyId   String
+  subjectId String
+  study     Study   @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@id([studyId, subjectId])
+}
+
+model StudyCohort {
+  studyId  String
+  cohortId String
+  study    Study  @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  cohort   Cohort @relation(fields: [cohortId], references: [id], onDelete: Cascade)
+
+  @@id([studyId, cohortId])
+}
+
+model Assay {
+  id              String      @id
+  studyId         String
+  study           Study       @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  title           String
+  measurementType String?
+  technologyType  String?
+  procedures      Procedure[]
+  samples         Sample[]
+  datasets        Dataset[]
+
+  @@index([studyId])
+}
+
+model Procedure {
+  id          String  @id
+  assayId     String
+  assay       Assay   @relation(fields: [assayId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+}
+
+model Sample {
+  id          String    @id
+  subjectId   String
+  subject     Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  assayId     String?
+  assay       Assay?    @relation(fields: [assayId], references: [id])
+  sampleCode  String
+  sampleType  String
+  collectedOn DateTime?
+  datasets    Dataset[]
+
+  @@unique([subjectId, sampleCode])
+  @@index([assayId])
+}
+
+model Dataset {
+  id       String  @id
+  assayId  String?
+  assay    Assay?  @relation(fields: [assayId], references: [id])
+  sampleId String?
+  sample   Sample? @relation(fields: [sampleId], references: [id])
+  title    String
+  format   String
+  uri      String?
+
+  @@index([assayId])
+  @@index([sampleId])
+}
+
+model Event {
+  id                       String                    @id
+  organizationId           String
+  organization             Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  subjectId                String?
+  subject                  Subject?                  @relation(fields: [subjectId], references: [id])
+  housingUnitId            String?
+  housingUnit              HousingUnit?              @relation(fields: [housingUnitId], references: [id])
+  eventType                EventType
+  occurredAt               DateTime
+  recordedByUserId         String
+  recordedByUser           User                      @relation("RecordedEvents", fields: [recordedByUserId], references: [id])
+  reason                   String?
+  metadata                 Json?
+  transferEvent            TransferEvent?
+  mortalityEvent           MortalityEvent?
+  welfareObservation       WelfareObservation?
+  environmentalObservation EnvironmentalObservation?
+  auditEvents              AuditEvent[]
+
+  @@index([organizationId, eventType])
+  @@index([subjectId])
+  @@index([housingUnitId])
+}
+
+model TransferEvent {
+  id                String       @id
+  eventId           String       @unique
+  event             Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  fromHousingUnitId String?
+  fromHousingUnit   HousingUnit? @relation("TransferFromHousing", fields: [fromHousingUnitId], references: [id])
+  toHousingUnitId   String
+  toHousingUnit     HousingUnit  @relation("TransferToHousing", fields: [toHousingUnitId], references: [id])
+}
+
+model MortalityEvent {
+  id      String  @id
+  eventId String  @unique
+  event   Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  count   Int     @default(1)
+  cause   String?
+}
+
+model WelfareObservation {
+  id      String @id
+  eventId String @unique
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  score   Int
+  status  String
+  notes   String?
+}
+
+model EnvironmentalObservation {
+  id      String @id
+  eventId String @unique
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  metric  String
+  value   Decimal
+  unit    String
+}
+
+model AuditEvent {
+  id            String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actorUserId    String
+  actorUser      User         @relation(fields: [actorUserId], references: [id])
+  entityType     String
+  entityId       String
+  action         String
+  reason         String?
+  previousValue  Json?
+  newValue       Json?
+  createdAt      DateTime     @default(now())
+  requestId      String?
+  correlationId  String?
+  source         String
+  eventId        String?
+  event          Event?       @relation(fields: [eventId], references: [id])
+
+  @@index([organizationId, entityType, entityId])
+  @@index([actorUserId])
+  @@index([eventId])
+}
+
+model Request {
+  id                String        @id
+  organizationId    String
+  organization      Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  requestedByUserId String
+  requestedByUser   User          @relation(fields: [requestedByUserId], references: [id])
+  title             String
+  status            RequestStatus @default(draft)
+  metadata          Json
+  approvals         Approval[]
+  createdAt         DateTime      @default(now())
+}
+
+model Approval {
+  id             String           @id
+  requestId      String
+  request        Request          @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  approverUserId String
+  approverUser   User             @relation(fields: [approverUserId], references: [id])
+  decision       ApprovalDecision
+  decidedAt      DateTime
+  reason         String?
+}
+
+model Task {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  title          String
+  status         TaskStatus   @default(open)
+  assigneeUserId String?
+  assigneeUser   User?        @relation(fields: [assigneeUserId], references: [id])
+  dueAt          DateTime?
+}
+
+model Alert {
+  id             String        @id
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  severity       AlertSeverity
+  title          String
+  entityType     String
+  entityId       String
+  createdAt      DateTime      @default(now())
+  resolvedAt     DateTime?
+
+  @@index([organizationId, severity])
+}
+
+model ConnectedResourceLink {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  entityType     String
+  entityId       String
+  label          String
+  url            String
+  metadata       Json
+
+  @@index([organizationId, entityType, entityId])
+}
+
+model ConnectorCredential {
+  id                  String       @id
+  organizationId      String
+  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  connectorType       String
+  credentialReference String
+  createdAt           DateTime     @default(now())
+}
+
+model QRToken {
+  id               String         @id
+  organizationId   String
+  organization     Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  purpose          QRTokenPurpose
+  targetEntityType String
+  targetEntityId   String
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime       @default(now())
+
+  @@index([organizationId, targetEntityType, targetEntityId])
+}

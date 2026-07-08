@@ -12,10 +12,17 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "build": "pnpm prisma:generate && tsc -p tsconfig.json",
+    "prisma:generate": "prisma generate --config prisma.config.ts",
+    "prisma:validate": "prisma validate --config prisma.config.ts",
+    "seed": "tsx src/seed.ts",
+    "typecheck": "pnpm prisma:generate && tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@cohos/domain": "workspace:*"
+    "@cohos/domain": "workspace:*",
+    "@prisma/client": "^7.8.0"
+  },
+  "devDependencies": {
+    "prisma": "^7.8.0"
   }
 }

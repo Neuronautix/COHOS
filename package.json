@@ -13,9 +13,9 @@
     "dev": "pnpm --parallel --filter @cohos/api --filter @cohos/web dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "eslint . --max-warnings=0",
+    "lint": "pnpm --filter @cohos/db prisma:generate && eslint . --max-warnings=0",
     "test": "vitest run",
-    "typecheck": "tsc -b --pretty false && pnpm --filter @cohos/web typecheck"
+    "typecheck": "pnpm --filter @cohos/db prisma:generate && tsc -b --pretty false && pnpm --filter @cohos/web typecheck"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
