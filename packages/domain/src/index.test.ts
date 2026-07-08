@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  alertRuleConfigSchema,
   animalSpeciesSchema,
   assayDetailSchema,
   auditEventSchema,
@@ -18,6 +19,7 @@ import {
   researchVocabularySchema,
   rodentSubjectProfileSchema,
   roomSchema,
+  ruleAlertSchema,
   subjectEventStateSchema,
   studyDetailSchema,
   studySchema,
@@ -539,5 +541,54 @@ describe('event and audit boundary schemas', () => {
         eventId: 'event-1',
       }).success,
     ).toBe(true);
+  });
+});
+
+describe('rule and alert schemas', () => {
+  it('validates configurable welfare and environmental rule contracts', () => {
+    const welfareRule = alertRuleConfigSchema.parse({
+      id: 'rule-welfare-rodent-concern',
+      organizationId: 'org-cohos',
+      name: 'Rodent concern threshold',
+      ruleType: 'welfare_threshold',
+      severity: 'warning',
+      appliesToProfileTypes: ['rodent'],
+      appliesToSpeciesIds: ['species-mouse'],
+      statuses: ['concern', 'critical'],
+      minimumScore: 3,
+    });
+
+    expect(welfareRule.enabled).toBe(true);
+
+    expect(() =>
+      alertRuleConfigSchema.parse({
+        id: 'rule-env-invalid',
+        organizationId: 'org-cohos',
+        name: 'Invalid environmental rule',
+        ruleType: 'environmental_threshold',
+        severity: 'warning',
+        metric: 'temperature',
+        unit: 'celsius',
+      }),
+    ).toThrow(/minimumValue or maximumValue/);
+  });
+
+  it('validates generated rule alerts', () => {
+    const alert = ruleAlertSchema.parse({
+      id: 'alert-rule-welfare-event-001',
+      organizationId: 'org-cohos',
+      ruleId: 'rule-welfare-rodent-concern',
+      ruleType: 'welfare_threshold',
+      code: 'welfare_threshold_exceeded',
+      severity: 'warning',
+      title: 'Rodent concern threshold',
+      message: 'Welfare observation met the configured concern threshold.',
+      entityType: 'subject',
+      entityId: 'subject-rodent-001',
+      sourceEventIds: ['event-welfare-001'],
+      createdAt: '2026-07-08T09:00:00Z',
+    });
+
+    expect(alert.metadata).toEqual({});
   });
 });

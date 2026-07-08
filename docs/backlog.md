@@ -61,7 +61,7 @@ Unsafe parallel work:
 | OS-006 | Facility and housing API module                        | Completed locally | M          | Strongly coupled |
 | OS-007 | Investigation, study, and assay API module             | Completed locally | M          | Strongly coupled |
 | OS-008 | Event and audit model                                  | Completed locally | L          | Strongly coupled |
-| OS-009 | Welfare and environmental rule engine                  | Pending           | M          | Weakly coupled   |
+| OS-009 | Welfare and environmental rule engine                  | Completed locally | M          | Weakly coupled   |
 | OS-010 | ISA-JSON export skeleton                               | Pending           | M          | Weakly coupled   |
 | OS-011 | Connector interfaces and Metadatapp connector skeleton | Pending           | M          | Weakly coupled   |
 | OS-012 | QR token and scan workflow skeleton                    | Pending           | M          | Weakly coupled   |
@@ -330,7 +330,7 @@ Unsafe parallel work:
 
 - Objective: Create configurable rule evaluation for welfare, mortality, environmental thresholds, and cumulative harm placeholders.
 - Scope: Rule engine primitives, threshold config schemas, alert generation, tests.
-- Affected files/modules: `packages/rules/src/**`, `packages/domain/src/alerts/**`, tests.
+- Affected files/modules: `packages/rules/src/**`, `packages/domain/src/alerts.ts`, `docs/welfare-model.md`, tests.
 - Acceptance criteria:
   - Welfare observations can generate alerts.
   - Mortality threshold rules work for individual and batch contexts.
@@ -342,6 +342,18 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: High.
 - Token-optimization strategy: Implement pure functions and small fixtures; defer admin UI and jurisdiction profiles.
+- Branch: `feat/OS-009-rule-engine`.
+- Validation performed:
+  - `pnpm --filter @cohos/domain typecheck`
+  - `pnpm --filter @cohos/domain build`
+  - `pnpm --filter @cohos/rules typecheck`
+  - `pnpm --filter @cohos/rules build`
+  - `pnpm test -- packages/domain/src/index.test.ts packages/rules/src/index.test.ts`
+  - Full root validation before PR
+  - Forbidden legacy name scan
+- Validation result: Passed local domain/rules focused validation and full root validation.
+- Risks: Rule evaluation is a pure package contract and is not yet wired into persistent alert storage or API mutation flows; OS-017 can consume the generated alert records for UI/reporting behavior.
+- Review result: Self-review passed locally; subagent review attempt was blocked by account usage limits.
 
 ### OS-010: ISA-JSON export skeleton
 
