@@ -65,7 +65,7 @@ Unsafe parallel work:
 | OS-010 | ISA-JSON export skeleton                               | Completed locally | M          | Weakly coupled   |
 | OS-011 | Connector interfaces and Metadatapp connector skeleton | Completed locally | M          | Weakly coupled   |
 | OS-012 | QR token and scan workflow skeleton                    | Completed locally | M          | Weakly coupled   |
-| OS-013 | Web app shell and navigation                           | Pending           | M          | Strongly coupled |
+| OS-013 | Web app shell and navigation                           | Completed locally | M          | Strongly coupled |
 | OS-014 | Subject list, detail, and model-specific views         | Pending           | M          | Strongly coupled |
 | OS-015 | Facility layout and housing detail views               | Pending           | M          | Strongly coupled |
 | OS-016 | Investigation, study, and assay views                  | Pending           | M          | Strongly coupled |
@@ -444,7 +444,7 @@ Unsafe parallel work:
 
 - Objective: Create the Next.js web app shell with navigation for MVP areas.
 - Scope: App setup, layout, navigation, TanStack Query provider, basic API client, shared UI package usage.
-- Affected files/modules: `apps/web/src/**`, `apps/web/package.json`, `packages/ui/src/**`.
+- Affected files/modules: `apps/web/src/**`, `apps/web/package.json`, `packages/ui/src/**`, `pnpm-lock.yaml`.
 - Acceptance criteria:
   - Web app runs locally.
   - Navigation includes dashboard, subjects, facility, investigations, welfare, reports, connectors, QR scan, and admin settings.
@@ -456,6 +456,19 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Build a compact shell and shared primitives; avoid broad design system work.
+- Branch: `feat/OS-013-web-app-shell-navigation`.
+- Validation performed:
+  - `pnpm --filter @cohos/ui typecheck`
+  - `pnpm --filter @cohos/ui build`
+  - `pnpm --filter @cohos/web typecheck`
+  - `pnpm test -- apps/web/src/navigation.test.ts apps/web/src/lib/api-client.test.ts`
+  - `pnpm --filter @cohos/web build`
+  - Full root validation before PR
+  - Forbidden legacy name scan
+  - Built web server smoke test for `/` and `/subjects` on a temporary local port
+- Validation result: Passed local UI/web focused validation, full root validation, forbidden-name scan, and web server smoke test.
+- Risks: Pages use static operational surfaces until OS-014 through OS-018 wire route-specific API reads and mutations.
+- Review result: Self-review passed locally; subagent review was unavailable due account usage limits.
 
 ### OS-014: Subject list, detail, and model-specific views
 
