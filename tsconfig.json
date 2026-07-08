@@ -1,7 +1,6 @@
 {
   "files": [],
   "references": [
-    { "path": "./apps/api" },
     { "path": "./packages/audit" },
     { "path": "./packages/connectors" },
     { "path": "./packages/db" },
@@ -10,6 +9,7 @@
     { "path": "./packages/qr" },
     { "path": "./packages/reporting" },
     { "path": "./packages/rules" },
-    { "path": "./packages/ui" }
+    { "path": "./packages/ui" },
+    { "path": "./apps/api" }
   ]
 }

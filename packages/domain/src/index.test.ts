@@ -130,6 +130,38 @@ describe('subject profile schemas', () => {
     expect(rejected.success).toBe(false);
   });
 
+  it('requires human subject codes to match pseudonymized profile codes', () => {
+    const accepted = subjectWithProfileSchema.safeParse({
+      id: 'subject-human-pseudo-003',
+      organizationId: 'org-1',
+      subjectCode: 'HUM-PSEUDO-003',
+      profileType: 'human',
+      profile: {
+        profileType: 'human',
+        pseudonymizedSubjectCode: 'HUM-PSEUDO-003',
+        consentStatus: 'unknown',
+        studyParticipationStatus: 'screening',
+      },
+    });
+
+    expect(accepted.success).toBe(true);
+
+    const rejected = subjectWithProfileSchema.safeParse({
+      id: 'subject-human-pseudo-004',
+      organizationId: 'org-1',
+      subjectCode: 'DIRECT-HUMAN-CODE',
+      profileType: 'human',
+      profile: {
+        profileType: 'human',
+        pseudonymizedSubjectCode: 'HUM-PSEUDO-004',
+        consentStatus: 'consented',
+        studyParticipationStatus: 'enrolled',
+      },
+    });
+
+    expect(rejected.success).toBe(false);
+  });
+
   it('requires structured NCBITaxon identifiers for animal profiles', () => {
     expect(animalSpeciesSchema.safeParse(mouseSpecies).success).toBe(true);
     expect(
