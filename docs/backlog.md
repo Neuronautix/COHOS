@@ -72,7 +72,7 @@ Unsafe parallel work:
 | OS-017 | Welfare, alerts, and reports views                     | Completed locally | M          | Strongly coupled |
 | OS-018 | Connector settings and export UI                       | Completed locally | M          | Weakly coupled   |
 | OS-019 | Test suite hardening                                   | Completed locally | M          | Weakly coupled   |
-| OS-020 | Documentation completion                               | Pending           | M          | Weakly coupled   |
+| OS-020 | Documentation completion                               | Completed locally | M          | Weakly coupled   |
 | OS-021 | CI and release-readiness cleanup                       | Pending           | M          | Weakly coupled   |
 
 ## Tickets
@@ -679,6 +679,18 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Update docs incrementally after each ticket; reserve OS-020 for consistency review and gaps.
+- Branch: `feat/OS-020-documentation-completion`.
+- Validation performed:
+  - `pnpm exec prettier --write README.md docs/architecture.md docs/domain-model.md docs/isa-mapping.md docs/connector-design.md docs/audit-security.md docs/welfare-model.md docs/qr-workflows.md docs/development-loop.md docs/backlog.md`
+  - `pnpm format:check`
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm build`
+  - `pnpm test:forbidden-names`
+- Validation result: Passed full local validation and forbidden-name scan.
+- Risks: Documentation records implemented MVP behavior only; production persistence, authorization, live connector behavior, complete ISA conformance, PDF rendering, and QR image/token rotation remain deferred.
+- Review result: Self-review passed locally; subagent review unavailable due account usage limits.
 
 ### OS-021: CI and release-readiness cleanup
 

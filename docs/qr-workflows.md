@@ -2,6 +2,16 @@
 
 COHOS QR contracts identify a target entity and a bounded purpose. Tokens always include an expiry timestamp; permanent unrestricted tokens are not part of the workflow.
 
+## Package
+
+The implementation lives in `packages/qr` and exports:
+
+- `validateQrToken`
+- QR package name metadata
+- validation input types
+
+Domain QR schemas live in `packages/domain/src/qr.ts`.
+
 ## Token Fields
 
 - `purpose`: subject lookup, housing lookup, or quick action.
@@ -11,8 +21,31 @@ COHOS QR contracts identify a target entity and a bounded purpose. Tokens always
 - `revokedAt`: optional timestamp showing the token has been revoked.
 - `createdAt`, `createdByUserId`, and metadata for audit context.
 
-## Scan Flow
+## API Surface
 
-The API accepts a token id and optional scan timestamp at `POST /qr/scan`. The service returns a status of `valid`, `expired`, or `revoked`. Valid tokens return quick action intents that future UI flows can render as buttons or menu actions; expired and revoked tokens return no actions.
+The QR API module exposes:
 
-QR image generation, authentication/authorization checks, and persistence-backed token rotation are deferred. The current implementation defines deterministic contracts and scan semantics for future UI and API integration.
+- `GET /qr/tokens`
+- `GET /qr/tokens/:tokenId`
+- `POST /qr/scan`
+
+`POST /qr/scan` accepts a token ID and optional scan timestamp. The service returns a status of `valid`, `expired`, or `revoked`.
+
+## Quick Actions
+
+Valid subject tokens can return:
+
+- open subject
+- record welfare observation when the token purpose is quick action
+
+Valid housing-unit tokens can return:
+
+- open housing unit
+- record environmental observation when the token purpose is quick action
+- record transfer when the token purpose is quick action
+
+Expired and revoked tokens return no quick-action intents.
+
+## Security And Audit Notes
+
+The current implementation validates deterministic token semantics only. Authentication, authorization, scan audit persistence, QR image generation, and durable token rotation are deferred. Future scan handlers should record actor, timestamp, target, token status, and action intent without exposing sensitive target metadata in the QR payload.
