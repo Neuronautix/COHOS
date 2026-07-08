@@ -7,6 +7,8 @@ import {
   connectedResourceLinkSchema,
   environmentalObservationSchema,
   facilitySchema,
+  housingUnitDetailSchema,
+  housingUnitSummarySchema,
   farmAnimalProfileSchema,
   humanSubjectProfileSchema,
   investigationSchema,
@@ -254,6 +256,59 @@ describe('facility schemas', () => {
     expect(tankSchema.safeParse({ id: 'tank-2', roomId: 'room-1', type: 'cage' }).success).toBe(
       false,
     );
+  });
+
+  it('validates housing summaries, occupant summaries, and environmental hooks', () => {
+    expect(
+      housingUnitSummarySchema.safeParse({
+        id: 'tank-1',
+        roomId: 'room-1',
+        type: 'tank',
+        name: 'Tank 1',
+        code: 'T-1',
+        currentOccupantSubjectIds: ['subject-zebrafish-batch-1'],
+        currentOccupantCount: 120,
+        recentEnvironmentalObservationIds: ['event-env-1'],
+      }).success,
+    ).toBe(true);
+
+    expect(
+      housingUnitDetailSchema.safeParse({
+        id: 'tank-1',
+        roomId: 'room-1',
+        type: 'tank',
+        name: 'Tank 1',
+        code: 'T-1',
+        volumeLiters: 12,
+        occupants: [
+          {
+            subjectId: 'subject-zebrafish-batch-1',
+            subjectCode: 'ZFB-SYN-001',
+            profileType: 'zebrafish_batch',
+            status: 'active',
+            count: 120,
+          },
+        ],
+        recentEnvironmentalObservations: [
+          {
+            id: 'event-env-1',
+            housingUnitId: 'tank-1',
+            occurredAt: '2026-07-08T12:00:00Z',
+            metric: 'temperature',
+            value: 27.5,
+            unit: 'C',
+          },
+        ],
+        environmentalObservationTarget: {
+          housingUnitId: 'tank-1',
+          supportedEventType: 'environmental_observation',
+        },
+        transferTarget: {
+          housingUnitId: 'tank-1',
+          supportedEventType: 'transfer',
+        },
+      }).success,
+    ).toBe(true);
   });
 });
 
