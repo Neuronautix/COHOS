@@ -1,6 +1,5 @@
-import { WorkspacePage } from '../../components/workspace-page';
-import { workspacePages } from '../../data/workspace';
+import { FacilityOverview } from '../../features/facilities/facility-overview';
 
 export default function FacilityPage() {
-  return <WorkspacePage config={workspacePages.facilities} />;
+  return <FacilityOverview />;
 }

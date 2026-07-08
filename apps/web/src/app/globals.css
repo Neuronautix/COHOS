@@ -413,6 +413,11 @@ textarea {
   gap: 24px;
 }
 
+.facility-page {
+  display: grid;
+  gap: 24px;
+}
+
 .search-field {
   display: grid;
   gap: 6px;
@@ -623,6 +628,99 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+.facility-tree {
+  display: grid;
+  gap: 18px;
+}
+
+.facility-tree__facility,
+.facility-room {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.facility-tree__facility + .facility-tree__facility {
+  padding-top: 18px;
+  border-top: 1px solid #d8e0dd;
+}
+
+.facility-tree__heading,
+.facility-room__header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.facility-tree h3,
+.facility-tree h4,
+.facility-tree h5 {
+  margin: 0;
+  color: #17211f;
+}
+
+.facility-tree h3 {
+  font-size: 1.05rem;
+}
+
+.facility-tree h4,
+.facility-tree h5 {
+  font-size: 0.95rem;
+}
+
+.facility-tree p {
+  margin: 5px 0 0;
+  color: #667671;
+  font-size: 0.86rem;
+}
+
+.facility-room {
+  padding: 16px;
+  background: #f8faf9;
+  border: 1px solid #e0e7e4;
+  border-radius: 8px;
+}
+
+.housing-list,
+.occupant-list {
+  display: grid;
+  gap: 10px;
+}
+
+.housing-list__item,
+.occupant-list__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 72px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #e0e7e4;
+  border-radius: 8px;
+}
+
+.occupant-list__item {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.housing-list__item h5,
+.housing-list__item h4,
+.occupant-list__item h3 {
+  margin: 0;
+  color: #17211f;
+  font-size: 0.94rem;
+}
+
+.housing-list__item p,
+.occupant-list__item p {
+  margin: 5px 0 0;
+  color: #667671;
+  font-size: 0.84rem;
+  overflow-wrap: anywhere;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -699,6 +797,16 @@ textarea {
   }
 
   .work-list__item {
+    grid-template-columns: 1fr;
+  }
+
+  .facility-tree__heading,
+  .facility-room__header {
+    display: grid;
+  }
+
+  .housing-list__item,
+  .occupant-list__item {
     grid-template-columns: 1fr;
   }
 
