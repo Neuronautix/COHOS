@@ -4,7 +4,14 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['**/dist/**', '**/.next/**', '**/coverage/**', 'node_modules/**', 'pnpm-lock.yaml'],
+    ignores: [
+      '**/dist/**',
+      '**/.next/**',
+      '**/coverage/**',
+      'packages/db/src/generated/**',
+      'node_modules/**',
+      'pnpm-lock.yaml',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
@@ -17,7 +24,7 @@ export default tseslint.config(
       },
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['vitest.config.ts'],
+          allowDefaultProject: ['vitest.config.ts', 'packages/db/prisma.config.ts'],
         },
         tsconfigRootDir: import.meta.dirname,
       },
@@ -36,7 +43,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['**/*.js', '**/*.mjs'],
+    files: ['**/*.js', '**/*.mjs', 'packages/db/prisma.config.ts'],
     extends: [tseslint.configs.disableTypeChecked],
   },
 );
