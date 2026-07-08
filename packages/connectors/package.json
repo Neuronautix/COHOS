@@ -16,6 +16,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@cohos/domain": "workspace:*"
+    "@cohos/domain": "workspace:*",
+    "zod": "^4.4.3"
   }
 }
