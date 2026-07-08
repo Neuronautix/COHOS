@@ -50,30 +50,30 @@ Unsafe parallel work:
 
 ## Ticket Status Summary
 
-| ID | Title | Status | Complexity | Coupling |
-| --- | --- | --- | --- | --- |
-| OS-000 | Repository inspection and backlog initialization | Completed locally | XS | Independent |
-| OS-001 | Monorepo skeleton and workspace tooling | Pending | M | Strongly coupled |
-| OS-002 | Shared domain schemas and subject profile model | Pending | L | Strongly coupled |
-| OS-003 | Database schema and synthetic seed data | Pending | L | Strongly coupled |
-| OS-004 | API application skeleton and health endpoint | Pending | M | Strongly coupled |
-| OS-005 | Subject API module | Pending | M | Strongly coupled |
-| OS-006 | Facility and housing API module | Pending | M | Strongly coupled |
-| OS-007 | Investigation, study, and assay API module | Pending | M | Strongly coupled |
-| OS-008 | Event and audit model | Pending | L | Strongly coupled |
-| OS-009 | Welfare and environmental rule engine | Pending | M | Weakly coupled |
-| OS-010 | ISA-JSON export skeleton | Pending | M | Weakly coupled |
-| OS-011 | Connector interfaces and Metadatapp connector skeleton | Pending | M | Weakly coupled |
-| OS-012 | QR token and scan workflow skeleton | Pending | M | Weakly coupled |
-| OS-013 | Web app shell and navigation | Pending | M | Strongly coupled |
-| OS-014 | Subject list, detail, and model-specific views | Pending | M | Strongly coupled |
-| OS-015 | Facility layout and housing detail views | Pending | M | Strongly coupled |
-| OS-016 | Investigation, study, and assay views | Pending | M | Strongly coupled |
-| OS-017 | Welfare, alerts, and reports views | Pending | M | Strongly coupled |
-| OS-018 | Connector settings and export UI | Pending | M | Weakly coupled |
-| OS-019 | Test suite hardening | Pending | M | Weakly coupled |
-| OS-020 | Documentation completion | Pending | M | Weakly coupled |
-| OS-021 | CI and release-readiness cleanup | Pending | M | Weakly coupled |
+| ID     | Title                                                  | Status            | Complexity | Coupling         |
+| ------ | ------------------------------------------------------ | ----------------- | ---------- | ---------------- |
+| OS-000 | Repository inspection and backlog initialization       | Completed locally | XS         | Independent      |
+| OS-001 | Monorepo skeleton and workspace tooling                | Completed locally | M          | Strongly coupled |
+| OS-002 | Shared domain schemas and subject profile model        | Pending           | L          | Strongly coupled |
+| OS-003 | Database schema and synthetic seed data                | Pending           | L          | Strongly coupled |
+| OS-004 | API application skeleton and health endpoint           | Pending           | M          | Strongly coupled |
+| OS-005 | Subject API module                                     | Pending           | M          | Strongly coupled |
+| OS-006 | Facility and housing API module                        | Pending           | M          | Strongly coupled |
+| OS-007 | Investigation, study, and assay API module             | Pending           | M          | Strongly coupled |
+| OS-008 | Event and audit model                                  | Pending           | L          | Strongly coupled |
+| OS-009 | Welfare and environmental rule engine                  | Pending           | M          | Weakly coupled   |
+| OS-010 | ISA-JSON export skeleton                               | Pending           | M          | Weakly coupled   |
+| OS-011 | Connector interfaces and Metadatapp connector skeleton | Pending           | M          | Weakly coupled   |
+| OS-012 | QR token and scan workflow skeleton                    | Pending           | M          | Weakly coupled   |
+| OS-013 | Web app shell and navigation                           | Pending           | M          | Strongly coupled |
+| OS-014 | Subject list, detail, and model-specific views         | Pending           | M          | Strongly coupled |
+| OS-015 | Facility layout and housing detail views               | Pending           | M          | Strongly coupled |
+| OS-016 | Investigation, study, and assay views                  | Pending           | M          | Strongly coupled |
+| OS-017 | Welfare, alerts, and reports views                     | Pending           | M          | Strongly coupled |
+| OS-018 | Connector settings and export UI                       | Pending           | M          | Weakly coupled   |
+| OS-019 | Test suite hardening                                   | Pending           | M          | Weakly coupled   |
+| OS-020 | Documentation completion                               | Pending           | M          | Weakly coupled   |
+| OS-021 | CI and release-readiness cleanup                       | Pending           | M          | Weakly coupled   |
 
 ## Tickets
 
@@ -122,6 +122,19 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Generate minimal workspace files; avoid framework scaffolding that adds unused code; defer implementation details to package tickets.
+- Branch: `chore/OS-001-monorepo-skeleton-workspace-tooling`.
+- Validation performed:
+  - `pnpm install`
+  - `pnpm format`
+  - `pnpm format:check`
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm build`
+  - Forbidden legacy name scan
+- Validation result: Passed locally after adding package-local build output directories and ignoring the Next-managed `next-env.d.ts` file in Prettier.
+- Risks: Framework and tool versions were resolved from the live registry into `pnpm-lock.yaml`; future compatibility is pinned by the lockfile but should be watched in CI.
+- Review result: Self-review passed; subagent OS-001 architecture review confirmed scope should remain infrastructure-only.
 
 ### OS-002: Shared domain schemas and subject profile model
 
