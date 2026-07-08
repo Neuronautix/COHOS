@@ -54,7 +54,7 @@ Unsafe parallel work:
 | ------ | ------------------------------------------------------ | ----------------- | ---------- | ---------------- |
 | OS-000 | Repository inspection and backlog initialization       | Completed locally | XS         | Independent      |
 | OS-001 | Monorepo skeleton and workspace tooling                | Completed locally | M          | Strongly coupled |
-| OS-002 | Shared domain schemas and subject profile model        | Pending           | L          | Strongly coupled |
+| OS-002 | Shared domain schemas and subject profile model        | Completed locally | L          | Strongly coupled |
 | OS-003 | Database schema and synthetic seed data                | Pending           | L          | Strongly coupled |
 | OS-004 | API application skeleton and health endpoint           | Pending           | M          | Strongly coupled |
 | OS-005 | Subject API module                                     | Pending           | M          | Strongly coupled |
@@ -152,6 +152,15 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: High.
 - Token-optimization strategy: Keep schemas focused on MVP fields; centralize shared primitives; use tests to encode required behavior instead of verbose comments.
+- Branch: `feat/OS-002-shared-domain-schemas-subject-profile-model`.
+- Validation performed:
+  - `pnpm --filter @cohos/domain typecheck`
+  - `pnpm --filter @cohos/domain build`
+  - `pnpm test -- packages/domain/src/index.test.ts`
+  - Full root validation before PR
+- Validation result: Passed local package-level and full root validation.
+- Risks: Generic metadata remains intentionally extensible and can carry sensitive context if future APIs do not constrain usage; API and UI tickets must treat it as potentially sensitive.
+- Review result: Self-review passed locally; subagent OS-002 schema review confirmed required coverage and data-protection risks.
 
 ### OS-003: Database schema and synthetic seed data
 
