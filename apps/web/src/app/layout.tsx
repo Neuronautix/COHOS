@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 import './globals.css';
+import { AppShell } from '../components/app-shell';
+import { apiBaseUrl } from '../lib/api-client';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
@@ -13,7 +15,9 @@ export default function RootLayout({ children }: { readonly children: ReactNode 
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <AppShell apiBaseUrl={apiBaseUrl}>{children}</AppShell>
+        </Providers>
       </body>
     </html>
   );

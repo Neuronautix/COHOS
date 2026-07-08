@@ -1,11 +1,6 @@
-import { ShellSection } from '@cohos/ui';
+import { WorkspacePage } from '../components/workspace-page';
+import { dashboardConfig } from '../data/workspace';
 
 export default function HomePage() {
-  return (
-    <main>
-      <ShellSection title="COHOS">
-        <p>Subject management workspace scaffold.</p>
-      </ShellSection>
-    </main>
-  );
+  return <WorkspacePage config={dashboardConfig} />;
 }
