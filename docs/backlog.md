@@ -63,7 +63,7 @@ Unsafe parallel work:
 | OS-008 | Event and audit model                                  | Completed locally | L          | Strongly coupled |
 | OS-009 | Welfare and environmental rule engine                  | Completed locally | M          | Weakly coupled   |
 | OS-010 | ISA-JSON export skeleton                               | Completed locally | M          | Weakly coupled   |
-| OS-011 | Connector interfaces and Metadatapp connector skeleton | Pending           | M          | Weakly coupled   |
+| OS-011 | Connector interfaces and Metadatapp connector skeleton | Completed locally | M          | Weakly coupled   |
 | OS-012 | QR token and scan workflow skeleton                    | Pending           | M          | Weakly coupled   |
 | OS-013 | Web app shell and navigation                           | Pending           | M          | Strongly coupled |
 | OS-014 | Subject list, detail, and model-specific views         | Pending           | M          | Strongly coupled |
@@ -398,6 +398,18 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Define interfaces and typed placeholders only; avoid speculative API details.
+- Branch: `feat/OS-011-connector-skeleton`.
+- Validation performed:
+  - `pnpm install`
+  - `pnpm --filter @cohos/domain build`
+  - `pnpm --filter @cohos/connectors typecheck`
+  - `pnpm --filter @cohos/connectors build`
+  - `pnpm test -- packages/connectors/src/index.test.ts`
+  - Full root validation before PR
+  - Forbidden legacy name scan
+- Validation result: Passed local connector focused validation and full root validation.
+- Risks: Metadatapp behavior is intentionally a no-network skeleton; real credential resolution, request signing, pagination, retries, conflict resolution, and remote schema negotiation remain deferred.
+- Review result: Self-review passed locally; subagent review was unavailable due account usage limits.
 
 ### OS-012: QR token and scan workflow skeleton
 
