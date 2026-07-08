@@ -8,10 +8,11 @@ OS-000 started from an effectively empty repository:
 
 - Git repository exists with an unborn `main` branch and no commits.
 - `origin` is configured as `https://github.com/Neuronautix/COHOS.git`.
-- The remote currently has no branch heads.
+- The remote had no branch heads at initial inspection.
 - No package manager files, source files, CI configuration, docs, license, or tests exist yet.
 - Local tooling detected: Node.js 24.18.0, pnpm 11.10.0, GitHub CLI 2.95.0.
 - GitHub CLI authentication is available for the current user.
+- The first OS-000 branch push made the ticket branch the temporary GitHub default branch because no `main` branch existed.
 
 Initial constraints:
 
@@ -99,7 +100,10 @@ Unsafe parallel work:
   - Documentation review of `docs/backlog.md`
   - Forbidden legacy name scan
 - Validation result: Passed local validation. Root `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` are not available until OS-001 creates workspace tooling.
-- Risks: Remote has no branch heads, so first push/PR flow may differ from ordinary feature branch workflow.
+- Push result: Branch pushed to `origin/chore/OS-000-repository-inspection-backlog-initialization`.
+- PR result: PR creation was blocked because the remote had no separate `main` base branch or base SHA.
+- Merge result: No PR merge occurred for OS-000. Repository bootstrap must establish `main` before normal PR flow can begin.
+- Risks: First-ticket bootstrap required a nonstandard flow because the remote started with no branch heads.
 
 ### OS-001: Monorepo skeleton and workspace tooling
 
@@ -461,9 +465,10 @@ Unsafe parallel work:
 - Naming: Product vocabulary uses COHOS and required domain terms.
 - Test coverage: No executable code yet; forbidden-name scan passed.
 - Migration risk: None, because no database schema exists yet.
+- PR review result: Self-review passed. GitHub PR review could not run until a base branch exists.
 
 ## Follow-Up Notes
 
 - OS-001 should create the first executable validation surface.
 - OS-002 should be reviewed carefully before API, database, and UI work begin.
-- The first remote push may need to establish the initial branch because the remote has no branch heads.
+- OS-001 should branch from `main` after repository bootstrap is complete.
