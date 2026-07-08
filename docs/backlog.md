@@ -718,7 +718,7 @@ Unsafe parallel work:
   - `pnpm build`
   - `pnpm test:forbidden-names`
 - Validation result: Passed full local validation and forbidden-name scan.
-- CI/release result: Added a GitHub Actions workflow using pnpm 11.10.0, Node.js 24 LTS, frozen lockfile install, format check, lint, typecheck, test, build, and forbidden-name scan. Added Apache-2.0 license metadata and `LICENSE`.
+- CI/release result: Added a GitHub Actions workflow using pnpm 11.10.0, Node.js 24 LTS, frozen lockfile install, format check, build, lint, typecheck, test, and forbidden-name scan. Added Apache-2.0 license metadata and `LICENSE`.
 - Release-readiness risks:
   - API routes remain fixture-backed until Prisma-backed repositories and migrations are implemented.
   - Production authentication, authorization, tenant isolation, retention policy, and immutable database audit controls remain deferred.
