@@ -418,6 +418,11 @@ textarea {
   gap: 24px;
 }
 
+.research-page {
+  display: grid;
+  gap: 24px;
+}
+
 .search-field {
   display: grid;
   gap: 6px;
@@ -721,6 +726,55 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+.research-vocabulary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.research-vocabulary__item {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  background: #f8faf9;
+  border: 1px solid #e0e7e4;
+  border-radius: 8px;
+}
+
+.research-vocabulary__item h3,
+.research-card-list__item h3 {
+  margin: 0;
+  color: #17211f;
+  font-size: 0.95rem;
+}
+
+.research-vocabulary__item p,
+.research-card-list__item p {
+  margin: 6px 0 0;
+  color: #667671;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.research-card-list {
+  display: grid;
+  gap: 10px;
+}
+
+.research-card-list__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 72px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #e0e7e4;
+  border-radius: 8px;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -806,7 +860,12 @@ textarea {
   }
 
   .housing-list__item,
-  .occupant-list__item {
+  .occupant-list__item,
+  .research-card-list__item {
+    grid-template-columns: 1fr;
+  }
+
+  .research-vocabulary {
     grid-template-columns: 1fr;
   }
 
