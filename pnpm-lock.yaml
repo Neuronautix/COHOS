@@ -80,6 +80,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@cohos/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
       '@cohos/ui':
         specifier: workspace:*
         version: link:../../packages/ui
