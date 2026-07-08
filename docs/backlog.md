@@ -70,7 +70,7 @@ Unsafe parallel work:
 | OS-015 | Facility layout and housing detail views               | Completed locally | M          | Strongly coupled |
 | OS-016 | Investigation, study, and assay views                  | Completed locally | M          | Strongly coupled |
 | OS-017 | Welfare, alerts, and reports views                     | Completed locally | M          | Strongly coupled |
-| OS-018 | Connector settings and export UI                       | Pending           | M          | Weakly coupled   |
+| OS-018 | Connector settings and export UI                       | Completed locally | M          | Weakly coupled   |
 | OS-019 | Test suite hardening                                   | Pending           | M          | Weakly coupled   |
 | OS-020 | Documentation completion                               | Pending           | M          | Weakly coupled   |
 | OS-021 | CI and release-readiness cleanup                       | Pending           | M          | Weakly coupled   |
@@ -603,7 +603,7 @@ Unsafe parallel work:
 
 - Objective: Implement connector configuration and export workflow screens.
 - Scope: Connector settings, health check display, credential reference form, ISA export action, connected resource status.
-- Affected files/modules: `apps/web/src/app/connectors/**`, `apps/web/src/features/connectors/**`.
+- Affected files/modules: `packages/connectors/src/**`, `apps/api/src/connectors/**`, `apps/api/src/app.module.ts`, `apps/api/src/research/research.module.ts`, `apps/api/package.json`, `apps/api/tsconfig.json`, `apps/web/src/app/connectors/**`, `apps/web/src/features/connectors/**`, `apps/web/src/app/globals.css`, `apps/web/package.json`, `pnpm-lock.yaml`.
 - Acceptance criteria:
   - Connector settings use typed API contracts.
   - No real credentials are required or stored in seed examples.
@@ -614,6 +614,24 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Keep configuration forms narrow; avoid provider-specific assumptions beyond the skeleton.
+- Branch: `feat/OS-018-connector-export-ui`.
+- Validation performed:
+  - `pnpm --filter @cohos/connectors build`
+  - `pnpm --filter @cohos/api typecheck`
+  - `pnpm --filter @cohos/api build`
+  - `pnpm --filter @cohos/web typecheck`
+  - `pnpm test -- packages/connectors/src/index.test.ts apps/api/src/connectors/connectors.controller.test.ts apps/web/src/features/connectors/connector-formatters.test.ts apps/web/src/navigation.test.ts apps/web/src/lib/api-client.test.ts`
+  - `pnpm --filter @cohos/web build`
+  - `pnpm format:check`
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm build`
+  - Forbidden legacy name scan
+  - Built API smoke test for `/connectors`, `/connectors/dashboard`, connector settings update validation, health check, push placeholder, pull placeholder, resource status, ISA export source data, and browser CORS
+- Validation result: Passed local connector/API/web focused validation, full root validation, forbidden-name scan, and connector API smoke test.
+- Risks: Connector sync remains deterministic placeholder behavior; live credential resolution, provider network calls, and durable settings persistence remain deferred.
+- Review result: Self-review passed locally; subagent review was unavailable due account usage limits.
 
 ### OS-019: Test suite hardening
 

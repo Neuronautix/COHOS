@@ -26,6 +26,7 @@ export const connectorEntityTypeSchema = z.enum([
 export const connectorOperationSchema = z.enum(['health_check', 'push', 'pull']);
 export const connectorHealthStatusSchema = z.enum(['ready', 'not_configured', 'unavailable']);
 export const connectorSyncStatusSchema = z.enum(['accepted', 'skipped', 'failed']);
+export const connectorResourceSyncStatusSchema = z.enum(['linked', 'pending_review']);
 export const connectorErrorCodeSchema = z.enum([
   'configuration_invalid',
   'credentials_missing',
@@ -63,6 +64,15 @@ export const metadatappConnectorConfigSchema = connectorConfigBaseSchema.extend(
 export const connectorConfigSchema = z.discriminatedUnion('connectorType', [
   metadatappConnectorConfigSchema,
 ]);
+
+export const metadatappConnectorSettingsUpdateSchema = z.strictObject({
+  displayName: z.string().trim().min(1).optional(),
+  enabled: z.boolean().optional(),
+  credentialReference: credentialReferenceSchema.optional(),
+  baseUrl: z.string().url().optional(),
+  workspaceId: z.string().trim().min(1).optional(),
+  metadata: metadataObjectSchema.optional(),
+});
 
 export const connectorCredentialReferenceSchema = connectorCredentialSchema.extend({
   credentialReference: credentialReferenceSchema,
@@ -110,20 +120,37 @@ export const connectorPullResultSchema = z.strictObject({
   warnings: z.array(z.string().trim().min(1)).default([]),
 });
 
+export const connectorResourceStatusSchema = z.strictObject({
+  connectorType: connectorTypeSchema,
+  entityType: connectorEntityTypeSchema,
+  entityId: entityIdSchema,
+  externalUrl: z.string().url().optional(),
+  label: z.string().trim().min(1),
+  linkId: entityIdSchema,
+  message: z.string().trim().min(1),
+  source: z.string().trim().min(1),
+  status: connectorResourceSyncStatusSchema,
+});
+
 export type ConnectorType = z.infer<typeof connectorTypeSchema>;
 export type ConnectorEntityType = z.infer<typeof connectorEntityTypeSchema>;
 export type ConnectorOperation = z.infer<typeof connectorOperationSchema>;
 export type ConnectorHealthStatus = z.infer<typeof connectorHealthStatusSchema>;
 export type ConnectorSyncStatus = z.infer<typeof connectorSyncStatusSchema>;
+export type ConnectorResourceSyncStatus = z.infer<typeof connectorResourceSyncStatusSchema>;
 export type ConnectorErrorCode = z.infer<typeof connectorErrorCodeSchema>;
 export type CredentialReference = z.infer<typeof credentialReferenceSchema>;
 export type MetadatappConnectorConfig = z.infer<typeof metadatappConnectorConfigSchema>;
+export type MetadatappConnectorSettingsUpdate = z.infer<
+  typeof metadatappConnectorSettingsUpdateSchema
+>;
 export type ConnectorConfig = z.infer<typeof connectorConfigSchema>;
 export type ConnectorError = z.infer<typeof connectorErrorSchema>;
 export type ConnectorRecord = z.infer<typeof connectorRecordSchema>;
 export type ConnectorHealthCheckResult = z.infer<typeof connectorHealthCheckResultSchema>;
 export type ConnectorPushResult = z.infer<typeof connectorPushResultSchema>;
 export type ConnectorPullResult = z.infer<typeof connectorPullResultSchema>;
+export type ConnectorResourceStatus = z.infer<typeof connectorResourceStatusSchema>;
 
 export type ConnectorPushInput = {
   readonly records: readonly ConnectorRecord[];
@@ -150,6 +177,20 @@ function placeholderWarning(config: MetadatappConnectorConfig): string {
 
 export function createConnectorRecord(input: ConnectorRecord): ConnectorRecord {
   return connectorRecordSchema.parse(input);
+}
+
+export function updateMetadatappConnectorConfig(
+  config: MetadatappConnectorConfig,
+  input: MetadatappConnectorSettingsUpdate,
+): MetadatappConnectorConfig {
+  const update = metadatappConnectorSettingsUpdateSchema.parse(input);
+
+  return metadatappConnectorConfigSchema.parse({
+    ...config,
+    ...update,
+    metadata:
+      update.metadata === undefined ? config.metadata : { ...config.metadata, ...update.metadata },
+  });
 }
 
 export function mapInvestigationToMetadatappRecord(
@@ -190,6 +231,28 @@ export function mapConnectedResourceToConnectorRecord(
       url: link.url,
       metadata: link.metadata,
     },
+  });
+}
+
+export function mapConnectedResourceToConnectorStatus(
+  link: ConnectedResourceLink,
+): ConnectorResourceStatus {
+  const source = getMetadataString(link.metadata, 'source') ?? 'unknown';
+  const normalizedSource = source.toLowerCase();
+  const isMetadatappLink = normalizedSource === 'metadatapp';
+
+  return connectorResourceStatusSchema.parse({
+    connectorType: 'metadatapp',
+    entityType: link.entityType,
+    entityId: link.entityId,
+    externalUrl: link.url,
+    label: link.label,
+    linkId: link.id,
+    message: isMetadatappLink
+      ? 'Connected resource is mapped to the Metadatapp connector skeleton.'
+      : 'Connected resource is visible but not mapped to an active connector skeleton.',
+    source,
+    status: isMetadatappLink ? 'linked' : 'pending_review',
   });
 }
 
@@ -251,4 +314,13 @@ export class MetadatappConnector implements ConnectorAdapter {
 
 export function createMetadatappConnector(config: unknown): MetadatappConnector {
   return new MetadatappConnector(config);
+}
+
+function getMetadataString(
+  metadata: ConnectedResourceLink['metadata'],
+  key: string,
+): string | undefined {
+  const value = metadata[key];
+
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
 }

@@ -1,6 +1,5 @@
-import { WorkspacePage } from '../../components/workspace-page';
-import { workspacePages } from '../../data/workspace';
+import { ConnectorsOverview } from '../../features/connectors/connectors-overview';
 
 export default function ConnectorsPage() {
-  return <WorkspacePage config={workspacePages.connectors} />;
+  return <ConnectorsOverview />;
 }
