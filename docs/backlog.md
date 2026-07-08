@@ -57,7 +57,7 @@ Unsafe parallel work:
 | OS-002 | Shared domain schemas and subject profile model        | Completed locally | L          | Strongly coupled |
 | OS-003 | Database schema and synthetic seed data                | Completed locally | L          | Strongly coupled |
 | OS-004 | API application skeleton and health endpoint           | Completed locally | M          | Strongly coupled |
-| OS-005 | Subject API module                                     | Pending           | M          | Strongly coupled |
+| OS-005 | Subject API module                                     | Completed locally | M          | Strongly coupled |
 | OS-006 | Facility and housing API module                        | Pending           | M          | Strongly coupled |
 | OS-007 | Investigation, study, and assay API module             | Pending           | M          | Strongly coupled |
 | OS-008 | Event and audit model                                  | Pending           | L          | Strongly coupled |
@@ -233,6 +233,15 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Reuse domain schemas for DTOs; keep persistence adapter narrow; avoid duplicating validation rules.
+- Branch: `feat/OS-005-subject-api-module`.
+- Validation performed:
+  - `pnpm --filter @cohos/api typecheck`
+  - `pnpm --filter @cohos/api build`
+  - `pnpm test -- apps/api/src/subjects/subjects.controller.test.ts`
+  - Full root validation before PR
+- Validation result: Passed local API package and full root validation.
+- Risks: Subjects are served from an in-memory service seeded with synthetic fixtures; Prisma persistence wiring is deferred behind the service boundary.
+- Review result: Self-review passed locally. Subagent OS-005 review pending before PR merge.
 
 ### OS-006: Facility and housing API module
 
