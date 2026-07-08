@@ -1,6 +1,5 @@
-import { WorkspacePage } from '../../components/workspace-page';
-import { workspacePages } from '../../data/workspace';
+import { WelfareOverview } from '../../features/operations/welfare-overview';
 
 export default function WelfarePage() {
-  return <WorkspacePage config={workspacePages.welfare} />;
+  return <WelfareOverview />;
 }
