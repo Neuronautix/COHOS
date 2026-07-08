@@ -1,6 +1,5 @@
-import { WorkspacePage } from '../../components/workspace-page';
-import { workspacePages } from '../../data/workspace';
+import { InvestigationOverview } from '../../features/research/investigation-overview';
 
 export default function InvestigationsPage() {
-  return <WorkspacePage config={workspacePages.investigations} />;
+  return <InvestigationOverview />;
 }

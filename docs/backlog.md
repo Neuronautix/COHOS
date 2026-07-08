@@ -68,7 +68,7 @@ Unsafe parallel work:
 | OS-013 | Web app shell and navigation                           | Completed locally | M          | Strongly coupled |
 | OS-014 | Subject list, detail, and model-specific views         | Completed locally | M          | Strongly coupled |
 | OS-015 | Facility layout and housing detail views               | Completed locally | M          | Strongly coupled |
-| OS-016 | Investigation, study, and assay views                  | Pending           | M          | Strongly coupled |
+| OS-016 | Investigation, study, and assay views                  | Completed locally | M          | Strongly coupled |
 | OS-017 | Welfare, alerts, and reports views                     | Pending           | M          | Strongly coupled |
 | OS-018 | Connector settings and export UI                       | Pending           | M          | Weakly coupled   |
 | OS-019 | Test suite hardening                                   | Pending           | M          | Weakly coupled   |
@@ -537,7 +537,7 @@ Unsafe parallel work:
 
 - Objective: Implement research metadata pages.
 - Scope: Investigation list/detail, study list/detail, assay/procedure views, linked subjects/cohorts, connected resources.
-- Affected files/modules: `apps/web/src/app/investigations/**`, `apps/web/src/features/research/**`.
+- Affected files/modules: `apps/web/src/app/investigations/**`, `apps/web/src/app/studies/**`, `apps/web/src/app/assays/**`, `apps/web/src/features/research/**`, `apps/web/src/app/globals.css`, research UI tests.
 - Acceptance criteria:
   - Views fetch real API data.
   - UI vocabulary maps investigation/study/assay clearly.
@@ -548,6 +548,22 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Use shared table/detail patterns; defer advanced planning tools.
+- Branch: `feat/OS-016-research-views`.
+- Validation performed:
+  - `pnpm --filter @cohos/domain build`
+  - `pnpm --filter @cohos/web typecheck`
+  - `pnpm test -- apps/web/src/features/research/research-formatters.test.ts apps/web/src/navigation.test.ts apps/web/src/lib/api-client.test.ts`
+  - `pnpm --filter @cohos/web build`
+  - `pnpm format:check`
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm build`
+  - Forbidden legacy name scan
+  - Built API smoke test for `/research/vocabulary`, `/investigations`, `/investigations/investigation-synthetic-001`, `/studies/study-synthetic-001`, `/assays/assay-synthetic-001`, filtered connected-resource links, and browser CORS
+- Validation result: Passed local domain/web focused validation, full root validation, forbidden-name scan, and research API smoke test.
+- Risks: Research views are read-only; create/update forms for investigation, study, assay, and procedure records remain deferred.
+- Review result: Self-review passed locally; subagent review was unavailable due account usage limits.
 
 ### OS-017: Welfare, alerts, and reports views
 
