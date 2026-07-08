@@ -56,7 +56,7 @@ Unsafe parallel work:
 | OS-001 | Monorepo skeleton and workspace tooling                | Completed locally | M          | Strongly coupled |
 | OS-002 | Shared domain schemas and subject profile model        | Completed locally | L          | Strongly coupled |
 | OS-003 | Database schema and synthetic seed data                | Completed locally | L          | Strongly coupled |
-| OS-004 | API application skeleton and health endpoint           | Pending           | M          | Strongly coupled |
+| OS-004 | API application skeleton and health endpoint           | Completed locally | M          | Strongly coupled |
 | OS-005 | Subject API module                                     | Pending           | M          | Strongly coupled |
 | OS-006 | Facility and housing API module                        | Pending           | M          | Strongly coupled |
 | OS-007 | Investigation, study, and assay API module             | Pending           | M          | Strongly coupled |
@@ -205,6 +205,17 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Use NestJS defaults sparingly; implement only health and shared app wiring; defer feature modules.
+- Branch: `feat/OS-004-api-skeleton-health-endpoint`.
+- Validation performed:
+  - `pnpm --filter @cohos/api typecheck`
+  - `pnpm --filter @cohos/api build`
+  - `pnpm test -- apps/api/src/health/health.service.test.ts`
+  - Built API smoke test against `GET /health` on a temporary local port
+  - Vitest HTTP route test for `GET /health`
+  - Full root validation before PR
+- Validation result: Passed local package-level, HTTP smoke, and full root validation.
+- Risks: API persistence and domain feature modules are intentionally deferred to OS-005 and later tickets.
+- Review result: Self-review passed locally; subagent OS-004 review confirmed scope should remain health/bootstrap only and requested the committed HTTP route test.
 
 ### OS-005: Subject API module
 
