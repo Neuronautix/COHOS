@@ -13,6 +13,7 @@ OS-000 started from an effectively empty repository:
 - Local tooling detected: Node.js 24.18.0, pnpm 11.10.0, GitHub CLI 2.95.0.
 - GitHub CLI authentication is available for the current user.
 - The first OS-000 branch push made the ticket branch the temporary GitHub default branch because no `main` branch existed.
+- Repository bootstrap then created `main` from the validated OS-000 commit and set `main` as the default branch.
 
 Initial constraints:
 
@@ -102,7 +103,7 @@ Unsafe parallel work:
 - Validation result: Passed local validation. Root `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` are not available until OS-001 creates workspace tooling.
 - Push result: Branch pushed to `origin/chore/OS-000-repository-inspection-backlog-initialization`.
 - PR result: PR creation was blocked because the remote had no separate `main` base branch or base SHA.
-- Merge result: No PR merge occurred for OS-000. Repository bootstrap must establish `main` before normal PR flow can begin.
+- Merge result: No PR merge occurred for OS-000. Repository bootstrap established `main` directly from the OS-000 commit so normal PR flow can begin with OS-001.
 - Risks: First-ticket bootstrap required a nonstandard flow because the remote started with no branch heads.
 
 ### OS-001: Monorepo skeleton and workspace tooling
@@ -465,10 +466,10 @@ Unsafe parallel work:
 - Naming: Product vocabulary uses COHOS and required domain terms.
 - Test coverage: No executable code yet; forbidden-name scan passed.
 - Migration risk: None, because no database schema exists yet.
-- PR review result: Self-review passed. GitHub PR review could not run until a base branch exists.
+- PR review result: Self-review passed. GitHub PR review could not run for OS-000 because no base branch existed when the first PR was attempted.
 
 ## Follow-Up Notes
 
 - OS-001 should create the first executable validation surface.
 - OS-002 should be reviewed carefully before API, database, and UI work begin.
-- OS-001 should branch from `main` after repository bootstrap is complete.
+- OS-001 should branch from `main`.
