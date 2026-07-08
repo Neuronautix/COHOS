@@ -33,7 +33,7 @@ The MVP does not yet provide:
 
 ## Stack
 
-- Node.js 22 or newer.
+- Node.js 24 LTS in CI, with Node.js 22 or newer allowed by local package engines.
 - pnpm 11 or newer.
 - TypeScript with strict project references.
 - NestJS API in `apps/api`.
@@ -107,6 +107,8 @@ pnpm test:forbidden-names
 
 The forbidden-name scan is intentionally a standalone Node script at `scripts/check-forbidden-legacy-names.mjs` so it works across shells without relying on platform-specific grep behavior.
 
+GitHub Actions runs the same validation set on Node.js 24 LTS with pnpm 11.10.0 and `pnpm install --frozen-lockfile`.
+
 ## Data Protection
 
 Human participant examples are synthetic and pseudonymized. Domain validation requires a human subject's `subjectCode` to match `profile.pseudonymizedSubjectCode`, and examples avoid direct identifying fields. Seed data uses synthetic users, organization names, subject codes, URLs, and connector credential references.
@@ -129,6 +131,10 @@ Authentication, authorization, immutable database enforcement, encryption, reten
 
 ## MVP Status
 
-OS-000 through OS-019 are merged. OS-020 completes the documentation set. OS-021 remains for CI and release-readiness cleanup.
+OS-000 through OS-021 complete the MVP backlog through CI and release-readiness cleanup.
 
 See `docs/backlog.md` for ticket history and `docs/development-loop.md` for the validation and PR workflow used by the repository.
+
+## License
+
+COHOS is licensed under Apache-2.0. See `LICENSE`.

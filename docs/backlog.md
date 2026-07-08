@@ -73,7 +73,7 @@ Unsafe parallel work:
 | OS-018 | Connector settings and export UI                       | Completed locally | M          | Weakly coupled   |
 | OS-019 | Test suite hardening                                   | Completed locally | M          | Weakly coupled   |
 | OS-020 | Documentation completion                               | Completed locally | M          | Weakly coupled   |
-| OS-021 | CI and release-readiness cleanup                       | Pending           | M          | Weakly coupled   |
+| OS-021 | CI and release-readiness cleanup                       | Completed locally | M          | Weakly coupled   |
 
 ## Tickets
 
@@ -696,7 +696,7 @@ Unsafe parallel work:
 
 - Objective: Add GitHub Actions CI and final MVP readiness checks.
 - Scope: CI workflow, lockfile validation, lint/typecheck/test/build commands, license confirmation, package metadata cleanup.
-- Affected files/modules: `.github/workflows/ci.yml`, root package files, license file if absent, docs status.
+- Affected files/modules: `.github/workflows/ci.yml`, `LICENSE`, `package.json`, `README.md`, `docs/development-loop.md`, `docs/backlog.md`.
 - Acceptance criteria:
   - CI installs dependencies and runs lint, typecheck, test, and build.
   - CI uses pnpm and current Node LTS or documented supported runtime.
@@ -708,6 +708,24 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Use one simple CI workflow; avoid release automation until package publishing is required.
+- Branch: `feat/OS-021-ci-release-readiness-cleanup`.
+- Validation performed:
+  - `pnpm exec prettier --write .github/workflows/ci.yml package.json README.md docs/development-loop.md docs/backlog.md`
+  - `pnpm format:check`
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm build`
+  - `pnpm test:forbidden-names`
+- Validation result: Passed full local validation and forbidden-name scan.
+- CI/release result: Added a GitHub Actions workflow using pnpm 11.10.0, Node.js 24 LTS, frozen lockfile install, format check, lint, typecheck, test, build, and forbidden-name scan. Added Apache-2.0 license metadata and `LICENSE`.
+- Release-readiness risks:
+  - API routes remain fixture-backed until Prisma-backed repositories and migrations are implemented.
+  - Production authentication, authorization, tenant isolation, retention policy, and immutable database audit controls remain deferred.
+  - Connector behavior remains a deterministic no-network skeleton.
+  - Complete ISA-JSON conformance, ISA-Tab, RO-Crate, JSON-LD, PDF rendering, QR image generation, and durable QR token rotation remain deferred.
+  - CI covers deterministic local validation only; live provider, browser E2E, and external database integration tests remain future work.
+- Review result: Self-review passed locally; subagent review unavailable due account usage limits.
 
 ## Review Log
 

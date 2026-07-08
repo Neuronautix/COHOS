@@ -6,7 +6,7 @@ This repository uses a small repeatable loop: branch, implement a focused ticket
 
 Required local tools:
 
-- Node.js 22 or newer
+- Node.js 24 LTS for CI parity, or Node.js 22 or newer for local development
 - pnpm 11 or newer
 - Git
 - GitHub CLI for PR publishing and merge operations
@@ -43,6 +43,8 @@ pnpm test
 pnpm build
 pnpm test:forbidden-names
 ```
+
+GitHub Actions runs the same validation set on `ubuntu-latest` with Node.js 24 and pnpm 11.10.0 after `pnpm install --frozen-lockfile`.
 
 Run package-focused checks:
 
