@@ -5,6 +5,7 @@ import type {
   ConnectedResourceLink,
   EnvironmentalObservation,
   HumanSubjectProfile,
+  MortalityEvent,
   RodentSubjectProfile,
   SubjectWithProfile,
   TransferEvent,
@@ -373,6 +374,18 @@ export const seedEnvironmentalObservation = {
   unit: 'C',
 } satisfies EnvironmentalObservation;
 
+export const seedMortalityEvent = {
+  id: 'event-mortality-zebrafish-1',
+  organizationId: seedOrganization.id,
+  subjectId: 'subject-zebrafish-batch-001',
+  housingUnitId: seedHousingUnits.tank.id,
+  occurredAt: '2026-03-02T11:30:00Z',
+  recordedByUserId: 'user-seed-coordinator',
+  eventType: 'mortality',
+  count: 4,
+  cause: 'Synthetic fixture mortality record',
+} satisfies MortalityEvent;
+
 export const seedAuditEvent = {
   id: 'audit-seed-subject-create-1',
   organizationId: seedOrganization.id,
@@ -451,7 +464,12 @@ export const syntheticSeedData = {
   procedure: seedProcedure,
   sample: seedSample,
   dataset: seedDataset,
-  events: [seedTransferEvent, seedWelfareObservation, seedEnvironmentalObservation],
+  events: [
+    seedTransferEvent,
+    seedWelfareObservation,
+    seedEnvironmentalObservation,
+    seedMortalityEvent,
+  ],
   auditEvents: [seedAuditEvent],
   alerts: [seedAlert],
   connectedResourceLinks: [seedConnectedResourceLink],

@@ -413,6 +413,19 @@ async function main() {
       });
     }
 
+    if (event.eventType === 'mortality') {
+      await prisma.mortalityEvent.upsert({
+        where: { eventId: event.id },
+        update: {},
+        create: {
+          id: `mortality-${event.id}`,
+          eventId: event.id,
+          count: event.count,
+          cause: optionalString('cause' in event ? event.cause : undefined),
+        },
+      });
+    }
+
     if (event.eventType === 'environmental_observation') {
       await prisma.environmentalObservation.upsert({
         where: { eventId: event.id },

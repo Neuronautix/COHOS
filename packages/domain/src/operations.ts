@@ -15,6 +15,7 @@ export const eventTypeSchema = z.enum([
 ]);
 
 export const alertSeveritySchema = z.enum(['info', 'warning', 'critical']);
+export const aliveStatusSchema = z.enum(['alive', 'deceased']);
 export const requestStatusSchema = z.enum([
   'draft',
   'submitted',
@@ -81,6 +82,39 @@ export const auditEventSchema = z.strictObject({
   requestId: entityIdSchema.optional(),
   correlationId: entityIdSchema.optional(),
   source: z.string().trim().min(1),
+  eventId: entityIdSchema.optional(),
+});
+
+export const derivedAlertCodeSchema = z.enum([
+  'mortality_recorded',
+  'batch_depleted',
+  'welfare_watch',
+  'welfare_concern',
+  'welfare_critical',
+  'environmental_recorded',
+]);
+
+export const derivedAlertFlagSchema = z.strictObject({
+  code: derivedAlertCodeSchema,
+  severity: alertSeveritySchema,
+  message: z.string().trim().min(1),
+  sourceEventId: entityIdSchema,
+});
+
+export const subjectEventStateSchema = z.strictObject({
+  subjectId: entityIdSchema,
+  aliveStatus: aliveStatusSchema.default('alive'),
+  currentHousingUnitId: entityIdSchema.optional(),
+  batchCount: z.number().int().nonnegative().optional(),
+  latestWelfareStatus: z.enum(['normal', 'watch', 'concern', 'critical']).optional(),
+  latestEventId: entityIdSchema.optional(),
+  alertFlags: z.array(derivedAlertFlagSchema).default([]),
+});
+
+export const housingEventStateSchema = z.strictObject({
+  housingUnitId: entityIdSchema,
+  latestEnvironmentalObservationId: entityIdSchema.optional(),
+  alertFlags: z.array(derivedAlertFlagSchema).default([]),
 });
 
 export const requestSchema = z.strictObject({
@@ -146,6 +180,11 @@ export type MortalityEvent = z.infer<typeof mortalityEventSchema>;
 export type WelfareObservation = z.infer<typeof welfareObservationSchema>;
 export type EnvironmentalObservation = z.infer<typeof environmentalObservationSchema>;
 export type AuditEvent = z.infer<typeof auditEventSchema>;
+export type AliveStatus = z.infer<typeof aliveStatusSchema>;
+export type DerivedAlertCode = z.infer<typeof derivedAlertCodeSchema>;
+export type DerivedAlertFlag = z.infer<typeof derivedAlertFlagSchema>;
+export type SubjectEventState = z.infer<typeof subjectEventStateSchema>;
+export type HousingEventState = z.infer<typeof housingEventStateSchema>;
 export type Request = z.infer<typeof requestSchema>;
 export type Approval = z.infer<typeof approvalSchema>;
 export type Task = z.infer<typeof taskSchema>;

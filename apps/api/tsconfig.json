@@ -12,5 +12,5 @@
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "references": [{ "path": "../../packages/domain" }]
+  "references": [{ "path": "../../packages/audit" }, { "path": "../../packages/domain" }]
 }
