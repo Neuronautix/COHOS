@@ -59,7 +59,7 @@ Unsafe parallel work:
 | OS-004 | API application skeleton and health endpoint           | Completed locally | M          | Strongly coupled |
 | OS-005 | Subject API module                                     | Completed locally | M          | Strongly coupled |
 | OS-006 | Facility and housing API module                        | Completed locally | M          | Strongly coupled |
-| OS-007 | Investigation, study, and assay API module             | Pending           | M          | Strongly coupled |
+| OS-007 | Investigation, study, and assay API module             | Completed locally | M          | Strongly coupled |
 | OS-008 | Event and audit model                                  | Pending           | L          | Strongly coupled |
 | OS-009 | Welfare and environmental rule engine                  | Pending           | M          | Weakly coupled   |
 | OS-010 | ISA-JSON export skeleton                               | Pending           | M          | Weakly coupled   |
@@ -284,6 +284,17 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Implement concise CRUD-like reads and creates; defer advanced workflow planning.
+- Branch: `feat/OS-007-research-api-module`.
+- Validation performed:
+  - `pnpm --filter @cohos/domain typecheck`
+  - `pnpm --filter @cohos/domain build`
+  - `pnpm --filter @cohos/api typecheck`
+  - `pnpm test -- packages/domain/src/index.test.ts apps/api/src/research/research.controller.test.ts`
+  - Full root validation before PR
+  - Forbidden legacy name scan
+- Validation result: Passed local API/domain focused validation and full root validation.
+- Risks: Research metadata is served from in-memory synthetic fixtures; advanced workflow planning, sample/dataset mutation, and connector synchronization remain deferred to later tickets.
+- Review result: Self-review passed locally. Subagent OS-007 review recommended canonical investigation/study/assay routes, connected-resource reads, and avoiding embedded human profiles; implementation matches those points.
 
 ### OS-008: Event and audit model
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   animalSpeciesSchema,
+  assayDetailSchema,
   auditEventSchema,
   cageSchema,
   connectedResourceLinkSchema,
@@ -11,9 +12,12 @@ import {
   housingUnitSummarySchema,
   farmAnimalProfileSchema,
   humanSubjectProfileSchema,
+  investigationDetailSchema,
   investigationSchema,
+  researchVocabularySchema,
   rodentSubjectProfileSchema,
   roomSchema,
+  studyDetailSchema,
   studySchema,
   subjectProfileSchema,
   subjectWithProfileSchema,
@@ -343,6 +347,93 @@ describe('research metadata schemas', () => {
         url: 'https://example.test/protocol',
       }).success,
     ).toBe(true);
+  });
+
+  it('validates research detail responses and vocabulary ordering', () => {
+    const connectedResource = {
+      id: 'link-1',
+      organizationId: 'org-1',
+      entityType: 'study',
+      entityId: 'study-1',
+      label: 'External protocol',
+      url: 'https://example.test/protocol',
+    };
+    const assayDetail = {
+      id: 'assay-1',
+      studyId: 'study-1',
+      title: 'Synthetic assay',
+      procedures: [
+        {
+          id: 'procedure-1',
+          assayId: 'assay-1',
+          name: 'Synthetic procedure',
+        },
+      ],
+      samples: [
+        {
+          id: 'sample-1',
+          subjectId: 'subject-1',
+          assayId: 'assay-1',
+          sampleCode: 'SAMPLE-1',
+          sampleType: 'derived specimen',
+        },
+      ],
+      datasets: [
+        {
+          id: 'dataset-1',
+          assayId: 'assay-1',
+          sampleId: 'sample-1',
+          title: 'Synthetic dataset',
+          format: 'json',
+        },
+      ],
+      connectedResources: [],
+    };
+    const studyDetail = {
+      id: 'study-1',
+      investigationId: 'investigation-1',
+      title: 'Synthetic study',
+      subjectIds: ['subject-1'],
+      cohortIds: ['cohort-1'],
+      assays: [assayDetail],
+      connectedResources: [connectedResource],
+    };
+    const vocabulary = researchVocabularySchema.parse({
+      terms: [
+        {
+          canonical: 'investigation',
+          equivalentTerms: ['project'],
+          description: 'Top-level research context.',
+        },
+        {
+          canonical: 'study',
+          equivalentTerms: ['experiment'],
+          description: 'Subject and cohort participation context.',
+        },
+        {
+          canonical: 'assay',
+          equivalentTerms: ['procedure'],
+          description: 'Measurement or observation plan.',
+        },
+      ],
+    });
+
+    expect(assayDetailSchema.safeParse(assayDetail).success).toBe(true);
+    expect(studyDetailSchema.safeParse(studyDetail).success).toBe(true);
+    expect(
+      investigationDetailSchema.safeParse({
+        id: 'investigation-1',
+        organizationId: 'org-1',
+        title: 'Synthetic investigation',
+        studies: [studyDetail],
+        connectedResources: [],
+      }).success,
+    ).toBe(true);
+    expect(vocabulary.terms.map((term) => term.canonical)).toEqual([
+      'investigation',
+      'study',
+      'assay',
+    ]);
   });
 });
 

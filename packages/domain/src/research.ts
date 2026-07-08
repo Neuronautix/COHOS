@@ -83,6 +83,33 @@ export const connectedResourceLinkSchema = z.strictObject({
   metadata: metadataObjectSchema.default({}),
 });
 
+export const assayDetailSchema = assaySchema.extend({
+  procedures: z.array(procedureSchema).default([]),
+  samples: z.array(sampleSchema).default([]),
+  datasets: z.array(datasetSchema).default([]),
+  connectedResources: z.array(connectedResourceLinkSchema).default([]),
+});
+
+export const studyDetailSchema = studySchema.extend({
+  assays: z.array(assayDetailSchema).default([]),
+  connectedResources: z.array(connectedResourceLinkSchema).default([]),
+});
+
+export const investigationDetailSchema = investigationSchema.extend({
+  studies: z.array(studyDetailSchema).default([]),
+  connectedResources: z.array(connectedResourceLinkSchema).default([]),
+});
+
+export const researchVocabularyTermSchema = z.strictObject({
+  canonical: z.enum(['investigation', 'study', 'assay']),
+  equivalentTerms: z.array(z.string().trim().min(1)).default([]),
+  description: z.string().trim().min(1),
+});
+
+export const researchVocabularySchema = z.strictObject({
+  terms: z.array(researchVocabularyTermSchema),
+});
+
 export type Organization = z.infer<typeof organizationSchema>;
 export type User = z.infer<typeof userSchema>;
 export type Role = z.infer<typeof roleSchema>;
@@ -93,3 +120,8 @@ export type Procedure = z.infer<typeof procedureSchema>;
 export type Sample = z.infer<typeof sampleSchema>;
 export type Dataset = z.infer<typeof datasetSchema>;
 export type ConnectedResourceLink = z.infer<typeof connectedResourceLinkSchema>;
+export type AssayDetail = z.infer<typeof assayDetailSchema>;
+export type StudyDetail = z.infer<typeof studyDetailSchema>;
+export type InvestigationDetail = z.infer<typeof investigationDetailSchema>;
+export type ResearchVocabularyTerm = z.infer<typeof researchVocabularyTermSchema>;
+export type ResearchVocabulary = z.infer<typeof researchVocabularySchema>;
