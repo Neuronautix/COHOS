@@ -67,7 +67,7 @@ Unsafe parallel work:
 | OS-012 | QR token and scan workflow skeleton                    | Completed locally | M          | Weakly coupled   |
 | OS-013 | Web app shell and navigation                           | Completed locally | M          | Strongly coupled |
 | OS-014 | Subject list, detail, and model-specific views         | Completed locally | M          | Strongly coupled |
-| OS-015 | Facility layout and housing detail views               | Pending           | M          | Strongly coupled |
+| OS-015 | Facility layout and housing detail views               | Completed locally | M          | Strongly coupled |
 | OS-016 | Investigation, study, and assay views                  | Pending           | M          | Strongly coupled |
 | OS-017 | Welfare, alerts, and reports views                     | Pending           | M          | Strongly coupled |
 | OS-018 | Connector settings and export UI                       | Pending           | M          | Weakly coupled   |
@@ -504,7 +504,7 @@ Unsafe parallel work:
 
 - Objective: Implement facility hierarchy and cage/tank detail pages.
 - Scope: Facility layout, room/rack/housing navigation, housing detail, current occupants, environmental observation summary.
-- Affected files/modules: `apps/web/src/app/facilities/**`, `apps/web/src/features/facilities/**`.
+- Affected files/modules: `apps/web/src/app/facilities/**`, `apps/web/src/features/facilities/**`, `apps/web/src/app/globals.css`, facility UI tests.
 - Acceptance criteria:
   - Facility hierarchy fetches from API.
   - Cage and tank details show housing-specific labels and occupant summaries.
@@ -515,6 +515,23 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Keep navigation simple; avoid diagramming complex floor plans in MVP.
+- Branch: `feat/OS-015-facility-housing-views`.
+- Validation performed:
+  - `pnpm format`
+  - `pnpm --filter @cohos/domain build`
+  - `pnpm --filter @cohos/web typecheck`
+  - `pnpm test -- apps/web/src/features/facilities/facility-formatters.test.ts apps/web/src/features/subjects/subject-formatters.test.ts apps/web/src/navigation.test.ts apps/web/src/lib/api-client.test.ts`
+  - `pnpm --filter @cohos/web build`
+  - `pnpm format:check`
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm build`
+  - Forbidden legacy name scan
+  - Built API smoke test for `/facilities`, `/facilities/facility-synthetic-main`, cage/tank housing details, and browser CORS
+- Validation result: Passed local domain/web focused validation, full root validation, forbidden-name scan, and facility API smoke test.
+- Risks: Facility views are read-only; transfer and environmental observation actions surface typed workflow targets but mutation forms remain deferred.
+- Review result: Self-review passed locally; subagent review was unavailable due account usage limits.
 
 ### OS-016: Investigation, study, and assay views
 
