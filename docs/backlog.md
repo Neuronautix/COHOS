@@ -60,7 +60,7 @@ Unsafe parallel work:
 | OS-005 | Subject API module                                     | Completed locally | M          | Strongly coupled |
 | OS-006 | Facility and housing API module                        | Completed locally | M          | Strongly coupled |
 | OS-007 | Investigation, study, and assay API module             | Completed locally | M          | Strongly coupled |
-| OS-008 | Event and audit model                                  | Pending           | L          | Strongly coupled |
+| OS-008 | Event and audit model                                  | Completed locally | L          | Strongly coupled |
 | OS-009 | Welfare and environmental rule engine                  | Pending           | M          | Weakly coupled   |
 | OS-010 | ISA-JSON export skeleton                               | Pending           | M          | Weakly coupled   |
 | OS-011 | Connector interfaces and Metadatapp connector skeleton | Pending           | M          | Weakly coupled   |
@@ -300,7 +300,7 @@ Unsafe parallel work:
 
 - Objective: Implement regulated operational events and append-only audit records.
 - Scope: Transfer events, mortality events, welfare observations, environmental observations, derived state helpers, audit event service and safeguards.
-- Affected files/modules: `packages/audit/src/**`, `packages/domain/src/events/**`, `apps/api/src/events/**`, `packages/db/prisma/schema.prisma`, tests.
+- Affected files/modules: `packages/audit/src/**`, `packages/domain/src/operations.ts`, `apps/api/src/events/**`, `packages/db/src/seed-data.ts`, `packages/db/src/seed.ts`, tests.
 - Acceptance criteria:
   - Events derive current housing, alive/deceased status, batch count, and alert flags where relevant.
   - Audit events are append-only in normal application logic.
@@ -312,6 +312,19 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: High.
 - Token-optimization strategy: Build pure derived-state functions first; keep API mutation paths narrow; avoid generalized workflow engines.
+- Branch: `feat/OS-008-event-audit-model`.
+- Validation performed:
+  - `pnpm --filter @cohos/domain typecheck`
+  - `pnpm --filter @cohos/domain build`
+  - `pnpm --filter @cohos/audit typecheck`
+  - `pnpm --filter @cohos/audit build`
+  - `pnpm --filter @cohos/api typecheck`
+  - `pnpm test -- packages/audit/src/index.test.ts packages/domain/src/index.test.ts packages/db/src/seed-data.test.ts apps/api/src/events/events.controller.test.ts`
+  - Full root validation before PR
+  - Forbidden legacy name scan
+- Validation result: Passed local domain/audit/API focused validation and full root validation.
+- Risks: Event and audit records are still fixture-backed in the API; Prisma append-only enforcement remains an application-service invariant until database-level migrations or triggers are explicitly introduced.
+- Review result: Self-review passed locally. Subagent OS-008 review called out the empty audit package, missing events API module, missing mortality fixture, and need for derived-state schemas; implementation addresses those items and adds read filters for events/audit records.
 
 ### OS-009: Welfare and environmental rule engine
 

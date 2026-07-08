@@ -41,6 +41,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@cohos/audit':
+        specifier: workspace:*
+        version: link:../../packages/audit
       '@cohos/domain':
         specifier: workspace:*
         version: link:../../packages/domain

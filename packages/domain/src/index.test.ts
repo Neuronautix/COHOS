@@ -6,6 +6,7 @@ import {
   auditEventSchema,
   cageSchema,
   connectedResourceLinkSchema,
+  housingEventStateSchema,
   environmentalObservationSchema,
   facilitySchema,
   housingUnitDetailSchema,
@@ -17,6 +18,7 @@ import {
   researchVocabularySchema,
   rodentSubjectProfileSchema,
   roomSchema,
+  subjectEventStateSchema,
   studyDetailSchema,
   studySchema,
   subjectProfileSchema,
@@ -483,5 +485,59 @@ describe('event and audit boundary schemas', () => {
     });
 
     expect(auditEvent.newValue?.redacted).toBe(true);
+  });
+
+  it('validates derived event state and event-linked audit records', () => {
+    expect(
+      subjectEventStateSchema.safeParse({
+        subjectId: 'subject-1',
+        aliveStatus: 'deceased',
+        currentHousingUnitId: 'housing-1',
+        batchCount: 0,
+        latestWelfareStatus: 'critical',
+        latestEventId: 'event-1',
+        alertFlags: [
+          {
+            code: 'batch_depleted',
+            severity: 'critical',
+            message: 'Batch count reached zero after mortality events.',
+            sourceEventId: 'event-1',
+          },
+        ],
+      }).success,
+    ).toBe(true);
+
+    expect(
+      housingEventStateSchema.safeParse({
+        housingUnitId: 'housing-1',
+        latestEnvironmentalObservationId: 'event-env-1',
+        alertFlags: [
+          {
+            code: 'environmental_recorded',
+            severity: 'info',
+            message: 'Environmental observation recorded for temperature.',
+            sourceEventId: 'event-env-1',
+          },
+        ],
+      }).success,
+    ).toBe(true);
+
+    expect(
+      auditEventSchema.safeParse({
+        id: 'audit-2',
+        organizationId: 'org-1',
+        actorUserId: 'user-1',
+        entityType: 'event',
+        entityId: 'event-1',
+        action: 'event.transfer.record',
+        newValue: {
+          hash: 'sha256:synthetic',
+          redacted: true,
+        },
+        createdAt: '2026-07-08T12:15:00Z',
+        source: 'api',
+        eventId: 'event-1',
+      }).success,
+    ).toBe(true);
   });
 });
