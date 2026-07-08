@@ -83,6 +83,12 @@ importers:
       '@cohos/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@cohos/isa':
+        specifier: workspace:*
+        version: link:../../packages/isa
+      '@cohos/reporting':
+        specifier: workspace:*
+        version: link:../../packages/reporting
       '@cohos/ui':
         specifier: workspace:*
         version: link:../../packages/ui

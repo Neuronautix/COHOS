@@ -423,6 +423,11 @@ textarea {
   gap: 24px;
 }
 
+.operations-page {
+  display: grid;
+  gap: 24px;
+}
+
 .search-field {
   display: grid;
   gap: 6px;
@@ -773,6 +778,36 @@ textarea {
   background: #ffffff;
   border: 1px solid #e0e7e4;
   border-radius: 8px;
+}
+
+.report-action-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.report-action-button {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 10px;
+  color: #17623f;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  background: #e8f6ee;
+  border: 1px solid #b9dfc9;
+  border-radius: 8px;
+}
+
+.report-action-button:disabled {
+  color: #6f7d79;
+  cursor: not-allowed;
+  background: #eef2f1;
+  border-color: #d3dcda;
 }
 
 .visually-hidden {

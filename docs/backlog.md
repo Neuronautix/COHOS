@@ -69,7 +69,7 @@ Unsafe parallel work:
 | OS-014 | Subject list, detail, and model-specific views         | Completed locally | M          | Strongly coupled |
 | OS-015 | Facility layout and housing detail views               | Completed locally | M          | Strongly coupled |
 | OS-016 | Investigation, study, and assay views                  | Completed locally | M          | Strongly coupled |
-| OS-017 | Welfare, alerts, and reports views                     | Pending           | M          | Strongly coupled |
+| OS-017 | Welfare, alerts, and reports views                     | Completed locally | M          | Strongly coupled |
 | OS-018 | Connector settings and export UI                       | Pending           | M          | Weakly coupled   |
 | OS-019 | Test suite hardening                                   | Pending           | M          | Weakly coupled   |
 | OS-020 | Documentation completion                               | Pending           | M          | Weakly coupled   |
@@ -569,7 +569,7 @@ Unsafe parallel work:
 
 - Objective: Implement welfare, alert, and export/report screens.
 - Scope: Welfare observations, alert list, mortality/environment summaries, export actions for CSV, JSON, PDF, and ISA JSON where available.
-- Affected files/modules: `apps/web/src/app/welfare/**`, `apps/web/src/app/reports/**`, `packages/reporting/src/**`.
+- Affected files/modules: `apps/web/src/app/welfare/**`, `apps/web/src/app/reports/**`, `apps/web/src/features/operations/**`, `packages/reporting/src/**`, `apps/web/src/app/globals.css`, `apps/web/package.json`, `pnpm-lock.yaml`, operations/reporting tests.
 - Acceptance criteria:
   - Alert and welfare data fetch from API.
   - Report/export actions call real endpoints or typed package functions.
@@ -580,6 +580,24 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Implement small report adapters; avoid full PDF styling until data contracts stabilize.
+- Branch: `feat/OS-017-welfare-alerts-reports`.
+- Validation performed:
+  - `pnpm --filter @cohos/domain build`
+  - `pnpm --filter @cohos/isa build`
+  - `pnpm --filter @cohos/reporting build`
+  - `pnpm --filter @cohos/web typecheck`
+  - `pnpm test -- packages/reporting/src/index.test.ts apps/web/src/features/operations/operations-formatters.test.ts apps/web/src/navigation.test.ts apps/web/src/lib/api-client.test.ts`
+  - `pnpm --filter @cohos/web build`
+  - `pnpm format:check`
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm build`
+  - Forbidden legacy name scan
+  - Built API smoke test for `/events`, mortality event filtering, derived subject and housing state, `/alerts`, `/audit-events`, `/subjects`, `/investigations`, and browser CORS
+- Validation result: Passed local package/web focused validation, full root validation, forbidden-name scan, and operations API smoke test.
+- Risks: Welfare and report screens are read-only except client-side CSV/JSON/ISA JSON downloads; PDF export is surfaced as planned until report layout contracts stabilize.
+- Review result: Self-review passed locally; subagent review was unavailable due account usage limits.
 
 ### OS-018: Connector settings and export UI
 
