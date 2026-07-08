@@ -3,7 +3,16 @@
   "version": "0.0.0",
   "private": true,
   "description": "COHOS subject management system monorepo.",
+  "license": "Apache-2.0",
   "packageManager": "pnpm@11.10.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Neuronautix/COHOS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Neuronautix/COHOS/issues"
+  },
+  "homepage": "https://github.com/Neuronautix/COHOS#readme",
   "engines": {
     "node": ">=22.0.0",
     "pnpm": ">=11.0.0"
