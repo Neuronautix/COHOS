@@ -19,6 +19,7 @@ import { ResearchService } from './research.service.js';
     ProceduresController,
     ConnectedResourceLinksController,
   ],
+  exports: [ResearchService],
   providers: [ResearchService],
 })
 export class ResearchModule {}

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
+import { ConnectorsModule } from './connectors/connectors.module.js';
 import { EventsModule } from './events/events.module.js';
 import { FacilitiesModule } from './facilities/facilities.module.js';
 import { HealthModule } from './health/health.module.js';
@@ -13,6 +14,7 @@ import { SubjectsModule } from './subjects/subjects.module.js';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ConnectorsModule,
     EventsModule,
     FacilitiesModule,
     HealthModule,

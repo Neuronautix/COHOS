@@ -6,8 +6,11 @@ import {
   createMetadatappConnector,
   credentialReferenceSchema,
   mapConnectedResourceToConnectorRecord,
+  mapConnectedResourceToConnectorStatus,
   mapInvestigationToMetadatappRecord,
   metadatappConnectorConfigSchema,
+  metadatappConnectorSettingsUpdateSchema,
+  updateMetadatappConnectorConfig,
 } from './index.js';
 
 const metadatappConfig = {
@@ -69,6 +72,32 @@ describe('connector contracts', () => {
     expect(parsed.enabled).toBe(true);
     expect(credentialReferenceSchema.safeParse('env:METADATAPP_TOKEN').success).toBe(true);
     expect(credentialReferenceSchema.safeParse('raw-token-value').success).toBe(false);
+    expect(
+      metadatappConnectorSettingsUpdateSchema.safeParse({
+        credentialReference: 'raw-token-value',
+      }).success,
+    ).toBe(false);
+  });
+
+  it('updates connector settings through the narrow typed settings contract', () => {
+    const parsed = metadatappConnectorConfigSchema.parse(metadatappConfig);
+    const updated = updateMetadatappConnectorConfig(parsed, {
+      credentialReference: 'env:METADATAPP_TOKEN',
+      enabled: false,
+      metadata: {
+        reviewState: 'pending',
+      },
+      workspaceId: 'workspace-updated',
+    });
+
+    expect(updated).toMatchObject({
+      credentialReference: 'env:METADATAPP_TOKEN',
+      enabled: false,
+      metadata: {
+        reviewState: 'pending',
+      },
+      workspaceId: 'workspace-updated',
+    });
   });
 
   it('maps COHOS research records into connector records', () => {
@@ -102,6 +131,19 @@ describe('connector contracts', () => {
         entityId: connectedResource.entityId,
         url: connectedResource.url,
       },
+    });
+  });
+
+  it('maps connected resources into sync status rows', () => {
+    const status = mapConnectedResourceToConnectorStatus(connectedResource);
+
+    expect(status).toMatchObject({
+      connectorType: 'metadatapp',
+      entityId: connectedResource.entityId,
+      externalUrl: connectedResource.url,
+      linkId: connectedResource.id,
+      source: 'unknown',
+      status: 'pending_review',
     });
   });
 

@@ -10,6 +10,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@cohos/connectors": "workspace:*",
     "@cohos/domain": "workspace:*",
     "@cohos/isa": "workspace:*",
     "@cohos/reporting": "workspace:*",

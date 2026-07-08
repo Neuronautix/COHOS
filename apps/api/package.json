@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@cohos/audit": "workspace:*",
+    "@cohos/connectors": "workspace:*",
     "@cohos/domain": "workspace:*",
     "@cohos/qr": "workspace:*",
     "@nestjs/common": "^11.1.27",
