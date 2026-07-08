@@ -408,6 +408,246 @@ textarea {
   border-color: #bad5e8;
 }
 
+.subject-page {
+  display: grid;
+  gap: 24px;
+}
+
+.search-field {
+  display: grid;
+  gap: 6px;
+  min-width: 260px;
+}
+
+.search-field span {
+  color: #667671;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.search-field input {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 12px;
+  color: #17211f;
+  background: #ffffff;
+  border: 1px solid #cfd9d6;
+  border-radius: 8px;
+}
+
+.search-field input:focus {
+  border-color: #2d6f99;
+  outline: 3px solid #d9edf8;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  padding: 0 12px 10px;
+  color: #667671;
+  font-size: 0.76rem;
+  text-align: left;
+  text-transform: uppercase;
+  border-bottom: 1px solid #d8e0dd;
+}
+
+.data-table td {
+  padding: 14px 12px;
+  color: #283532;
+  font-size: 0.9rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #edf1ef;
+}
+
+.data-table td strong,
+.data-table td span {
+  display: block;
+}
+
+.data-table td strong {
+  color: #17211f;
+  font-size: 0.95rem;
+}
+
+.data-table td span {
+  margin-top: 3px;
+  color: #7a8884;
+  font-size: 0.78rem;
+}
+
+.icon-link,
+.action-link {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 10px;
+  color: #22597c;
+  font-size: 0.84rem;
+  font-weight: 800;
+  background: #e8f2f8;
+  border: 1px solid #bad5e8;
+  border-radius: 8px;
+}
+
+.icon-link:hover,
+.action-link:hover {
+  color: #153f5a;
+  border-color: #7fb5d2;
+}
+
+.state-panel {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 180px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #d8e0dd;
+  border-radius: 8px;
+}
+
+.state-panel h2,
+.inline-empty-state h3 {
+  margin: 0;
+  color: #17211f;
+  font-size: 1.1rem;
+}
+
+.state-panel p,
+.inline-empty-state p {
+  max-width: 680px;
+  margin: 8px 0 0;
+  color: #5a6a65;
+  line-height: 1.5;
+}
+
+.inline-empty-state {
+  padding: 24px;
+  background: #f8faf9;
+  border: 1px dashed #c7d4d0;
+  border-radius: 8px;
+}
+
+.subject-loading {
+  display: grid;
+  gap: 18px;
+}
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.skeleton-block {
+  min-height: 128px;
+  background:
+    linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0.72),
+        rgba(255, 255, 255, 0)
+      )
+      0 0 / 220px 100% no-repeat,
+    #e5ece9;
+  border: 1px solid #d8e0dd;
+  border-radius: 8px;
+  animation: skeleton-shimmer 1.3s linear infinite;
+}
+
+.skeleton-block--wide {
+  min-height: 118px;
+}
+
+.skeleton-block--table {
+  min-height: 280px;
+}
+
+.field-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.field-list div,
+.subject-context article {
+  min-width: 0;
+  padding: 14px;
+  background: #f8faf9;
+  border: 1px solid #e0e7e4;
+  border-radius: 8px;
+}
+
+.field-list dt {
+  color: #667671;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.field-list dd {
+  margin: 7px 0 0;
+  color: #17211f;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.subject-context {
+  display: grid;
+  gap: 12px;
+}
+
+.subject-context h3 {
+  margin: 0 0 8px;
+  color: #667671;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+}
+
+.subject-context p {
+  margin: 0;
+  color: #17211f;
+  overflow-wrap: anywhere;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes skeleton-shimmer {
+  from {
+    background-position:
+      -220px 0,
+      0 0;
+  }
+
+  to {
+    background-position:
+      calc(100% + 220px) 0,
+      0 0;
+  }
+}
+
 @media (max-width: 1040px) {
   .app-shell {
     grid-template-columns: 1fr;
@@ -428,6 +668,10 @@ textarea {
 
   .metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .field-list {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -460,5 +704,17 @@ textarea {
 
   .status-badge {
     justify-self: start;
+  }
+
+  .search-field {
+    min-width: 0;
+  }
+
+  .skeleton-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .state-panel {
+    display: grid;
   }
 }

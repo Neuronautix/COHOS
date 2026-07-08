@@ -66,7 +66,7 @@ Unsafe parallel work:
 | OS-011 | Connector interfaces and Metadatapp connector skeleton | Completed locally | M          | Weakly coupled   |
 | OS-012 | QR token and scan workflow skeleton                    | Completed locally | M          | Weakly coupled   |
 | OS-013 | Web app shell and navigation                           | Completed locally | M          | Strongly coupled |
-| OS-014 | Subject list, detail, and model-specific views         | Pending           | M          | Strongly coupled |
+| OS-014 | Subject list, detail, and model-specific views         | Completed locally | M          | Strongly coupled |
 | OS-015 | Facility layout and housing detail views               | Pending           | M          | Strongly coupled |
 | OS-016 | Investigation, study, and assay views                  | Pending           | M          | Strongly coupled |
 | OS-017 | Welfare, alerts, and reports views                     | Pending           | M          | Strongly coupled |
@@ -474,7 +474,7 @@ Unsafe parallel work:
 
 - Objective: Implement functional subject views backed by the subject API.
 - Scope: Subject list, detail, model-specific sections for human participants, rodent subjects, zebrafish batches, farm animals, and generic subjects.
-- Affected files/modules: `apps/web/src/app/subjects/**`, `apps/web/src/features/subjects/**`, UI tests where practical.
+- Affected files/modules: `apps/web/src/app/subjects/**`, `apps/web/src/features/subjects/**`, `apps/web/src/app/globals.css`, `apps/web/package.json`, `apps/api/src/app.factory.ts`, `pnpm-lock.yaml`, UI tests.
 - Acceptance criteria:
   - Subject list and detail fetch real API data.
   - Model-specific labels and fields render correctly.
@@ -486,6 +486,19 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Reuse typed API client and small components; keep forms minimal.
+- Branch: `feat/OS-014-subject-views`.
+- Validation performed:
+  - `pnpm --filter @cohos/domain build`
+  - `pnpm --filter @cohos/api typecheck`
+  - `pnpm --filter @cohos/web typecheck`
+  - `pnpm test -- apps/web/src/features/subjects/subject-formatters.test.ts apps/web/src/navigation.test.ts apps/web/src/lib/api-client.test.ts`
+  - `pnpm --filter @cohos/web build`
+  - Full root validation before PR
+  - Forbidden legacy name scan
+  - Built API smoke test for `/subjects`, `/subjects/subject-human-pseudo-001`, and browser CORS
+- Validation result: Passed local domain/API/web focused validation, full root validation, forbidden-name scan, and subject API smoke test.
+- Risks: Subject create/update forms remain deferred; web subject views rely on the configured API being reachable from the browser.
+- Review result: Self-review passed locally; subagent review was unavailable due account usage limits.
 
 ### OS-015: Facility layout and housing detail views
 

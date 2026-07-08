@@ -1,6 +1,5 @@
-import { WorkspacePage } from '../../components/workspace-page';
-import { workspacePages } from '../../data/workspace';
+import { SubjectList } from '../../features/subjects/subject-list';
 
 export default function SubjectsPage() {
-  return <WorkspacePage config={workspacePages.subjects} />;
+  return <SubjectList />;
 }
