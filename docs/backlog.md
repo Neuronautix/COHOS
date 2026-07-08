@@ -71,7 +71,7 @@ Unsafe parallel work:
 | OS-016 | Investigation, study, and assay views                  | Completed locally | M          | Strongly coupled |
 | OS-017 | Welfare, alerts, and reports views                     | Completed locally | M          | Strongly coupled |
 | OS-018 | Connector settings and export UI                       | Completed locally | M          | Weakly coupled   |
-| OS-019 | Test suite hardening                                   | Pending           | M          | Weakly coupled   |
+| OS-019 | Test suite hardening                                   | Completed locally | M          | Weakly coupled   |
 | OS-020 | Documentation completion                               | Pending           | M          | Weakly coupled   |
 | OS-021 | CI and release-readiness cleanup                       | Pending           | M          | Weakly coupled   |
 
@@ -637,7 +637,7 @@ Unsafe parallel work:
 
 - Objective: Ensure MVP test coverage covers required domain, event, rule, ISA, and naming behavior.
 - Scope: Add or consolidate tests across packages, forbidden-name scan, package-level fixtures, CI-compatible commands.
-- Affected files/modules: `packages/*/src/**/*.test.ts`, `apps/*/**/*.test.ts`, root test scripts.
+- Affected files/modules: `packages/audit/src/index.test.ts`, `packages/rules/src/index.test.ts`, `packages/db/src/seed-data.test.ts`, `scripts/check-forbidden-legacy-names.mjs`, `package.json`, `docs/backlog.md`.
 - Acceptance criteria:
   - Tests cover subject union validation, pseudonymization expectations, animal NCBITaxon fields, event-derived counts, mortality effects, welfare alerts, ISA output shape, and forbidden-name scan.
   - `pnpm test` passes at root.
@@ -648,6 +648,21 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Add focused tests near implementation packages; avoid large snapshots.
+- Branch: `feat/OS-019-test-suite-hardening`.
+- Validation performed:
+  - `pnpm --filter @cohos/audit build`
+  - `pnpm --filter @cohos/rules build`
+  - `pnpm test -- packages/audit/src/index.test.ts packages/rules/src/index.test.ts packages/db/src/seed-data.test.ts packages/domain/src/index.test.ts packages/isa/src/index.test.ts`
+  - `pnpm test:forbidden-names`
+  - `pnpm format:check`
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm build`
+  - Forbidden legacy name scan
+- Validation result: Passed local package focused validation, full root validation, and standalone forbidden-name scan.
+- Risks: Test suite remains deterministic and local-only; live integration and provider-network tests remain intentionally deferred.
+- Review result: Self-review passed locally; subagent review was unavailable due account usage limits.
 
 ### OS-020: Documentation completion
 

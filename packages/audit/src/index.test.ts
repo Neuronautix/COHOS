@@ -99,6 +99,42 @@ describe('audit helpers', () => {
     expect(batchState.alertFlags.map((flag) => flag.code)).toContain('batch_depleted');
   });
 
+  it('derives cumulative batch mortality counts without negative totals', () => {
+    const partialMortality = {
+      id: 'event-mortality-batch-partial-1',
+      organizationId: 'org-1',
+      subjectId: 'subject-batch-1',
+      occurredAt: '2026-03-01T13:00:00Z',
+      recordedByUserId: 'user-1',
+      eventType: 'mortality',
+      count: 4,
+    } satisfies Event;
+    const depletionMortality = {
+      id: 'event-mortality-batch-depletion-1',
+      organizationId: 'org-1',
+      subjectId: 'subject-batch-1',
+      occurredAt: '2026-03-01T14:00:00Z',
+      recordedByUserId: 'user-1',
+      eventType: 'mortality',
+      count: 200,
+    } satisfies Event;
+
+    const state = deriveSubjectEventState({
+      subjectId: 'subject-batch-1',
+      initialBatchCount: 120,
+      events: [depletionMortality, partialMortality],
+    });
+
+    expect(state.batchCount).toBe(0);
+    expect(state.aliveStatus).toBe('deceased');
+    expect(state.alertFlags.map((flag) => flag.code)).toEqual([
+      'mortality_recorded',
+      'mortality_recorded',
+      'batch_depleted',
+    ]);
+    expect(state.alertFlags.at(-1)?.sourceEventId).toBe(depletionMortality.id);
+  });
+
   it('derives housing environmental state', () => {
     const state = deriveHousingEventState({
       housingUnitId: 'housing-2',

@@ -262,6 +262,62 @@ describe('rule evaluation', () => {
     expect(alerts[0]?.sourceEventIds).toEqual([highTemperatureObservation.id]);
   });
 
+  it('routes welfare and mortality event evaluations by event type', () => {
+    const welfareAlerts = evaluateEventRules({
+      event: welfareObservation,
+      rules: [
+        {
+          id: 'rule-welfare-mouse-concern',
+          organizationId: 'org-cohos',
+          name: 'Mouse concern threshold',
+          ruleType: 'welfare_threshold',
+          severity: 'warning',
+          appliesToProfileTypes: ['rodent'],
+          appliesToSpeciesIds: ['species-mouse'],
+          statuses: ['concern'],
+          minimumScore: 3,
+        },
+      ],
+      subject: rodentSubject,
+    });
+    const mortalityAlerts = evaluateEventRules({
+      event: batchMortality,
+      rules: [
+        {
+          id: 'rule-batch-mortality-count',
+          organizationId: 'org-cohos',
+          name: 'Batch mortality count review',
+          ruleType: 'mortality_threshold',
+          severity: 'critical',
+          appliesToProfileTypes: ['zebrafish_batch'],
+          appliesToSpeciesIds: ['species-zebrafish'],
+          context: 'batch',
+          minimumCount: 4,
+        },
+      ],
+      startingBatchCount: 20,
+      subject: zebrafishBatch,
+    });
+
+    expect(welfareAlerts).toHaveLength(1);
+    expect(welfareAlerts[0]).toMatchObject({
+      code: 'welfare_threshold_exceeded',
+      ruleId: 'rule-welfare-mouse-concern',
+      sourceEventIds: [welfareObservation.id],
+    });
+    expect(mortalityAlerts).toHaveLength(1);
+    expect(mortalityAlerts[0]).toMatchObject({
+      code: 'mortality_threshold_exceeded',
+      metadata: {
+        context: 'batch',
+        count: 4,
+        mortalityPercent: 0.2,
+      },
+      ruleId: 'rule-batch-mortality-count',
+      sourceEventIds: [batchMortality.id],
+    });
+  });
+
   it('supports cumulative harm review placeholders without legal assumptions', () => {
     const alerts = evaluateCumulativeHarmPlaceholders({
       evaluatedAt: '2026-07-08T13:00:00Z',
