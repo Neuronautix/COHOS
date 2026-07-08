@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import { FacilitiesModule } from './facilities/facilities.module.js';
 import { HealthModule } from './health/health.module.js';
+import { ResearchModule } from './research/research.module.js';
 import { SubjectsModule } from './subjects/subjects.module.js';
 
 @Module({
@@ -12,6 +13,7 @@ import { SubjectsModule } from './subjects/subjects.module.js';
     }),
     FacilitiesModule,
     HealthModule,
+    ResearchModule,
     SubjectsModule,
   ],
 })
