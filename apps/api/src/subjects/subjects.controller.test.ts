@@ -116,4 +116,99 @@ describe('SubjectsController', () => {
 
     expect(response.status).toBe(400);
   });
+
+  it('rejects human subject codes that differ from the pseudonymized code', async () => {
+    const response = await fetch(`${await baseUrl()}/subjects`, {
+      body: JSON.stringify({
+        organizationId: 'org-synthetic-cohos',
+        subjectCode: 'DIRECT-HUMAN-CODE',
+        profileType: 'human',
+        profile: {
+          profileType: 'human',
+          pseudonymizedSubjectCode: 'HUM-PSEUDO-999',
+          consentStatus: 'pending',
+          studyParticipationStatus: 'screening',
+        },
+      }),
+      headers: {
+        'content-type': 'application/json',
+      },
+      method: 'POST',
+    });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('rejects direct human identifier fields', async () => {
+    const response = await fetch(`${await baseUrl()}/subjects`, {
+      body: JSON.stringify({
+        organizationId: 'org-synthetic-cohos',
+        subjectCode: 'HUM-PSEUDO-998',
+        profileType: 'human',
+        profile: {
+          profileType: 'human',
+          pseudonymizedSubjectCode: 'HUM-PSEUDO-998',
+          consentStatus: 'pending',
+          studyParticipationStatus: 'screening',
+          email: 'participant@example.test',
+          fullName: 'Synthetic Person',
+        },
+      }),
+      headers: {
+        'content-type': 'application/json',
+      },
+      method: 'POST',
+    });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('rejects animal profiles without structured NCBITaxon identifiers', async () => {
+    const root = await baseUrl();
+    const missingResponse = await fetch(`${root}/subjects`, {
+      body: JSON.stringify({
+        organizationId: 'org-synthetic-cohos',
+        subjectCode: 'ROD-SYN-998',
+        profileType: 'rodent',
+        profile: {
+          profileType: 'rodent',
+          species: {
+            id: 'species-mouse-invalid',
+            commonName: 'house mouse',
+            scientificName: 'Mus musculus',
+          },
+          sex: 'female',
+        },
+      }),
+      headers: {
+        'content-type': 'application/json',
+      },
+      method: 'POST',
+    });
+
+    const invalidResponse = await fetch(`${root}/subjects`, {
+      body: JSON.stringify({
+        organizationId: 'org-synthetic-cohos',
+        subjectCode: 'ROD-SYN-999',
+        profileType: 'rodent',
+        profile: {
+          profileType: 'rodent',
+          species: {
+            id: 'species-mouse-invalid',
+            commonName: 'house mouse',
+            scientificName: 'Mus musculus',
+            ncbiTaxonId: '10090',
+          },
+          sex: 'female',
+        },
+      }),
+      headers: {
+        'content-type': 'application/json',
+      },
+      method: 'POST',
+    });
+
+    expect(missingResponse.status).toBe(400);
+    expect(invalidResponse.status).toBe(400);
+  });
 });

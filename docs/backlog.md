@@ -241,7 +241,7 @@ Unsafe parallel work:
   - Full root validation before PR
 - Validation result: Passed local API package and full root validation.
 - Risks: Subjects are served from an in-memory service seeded with synthetic fixtures; Prisma persistence wiring is deferred behind the service boundary.
-- Review result: Self-review passed locally. Subagent OS-005 review pending before PR merge.
+- Review result: Self-review passed locally. Subagent OS-005 review found a human pseudonymization blocker; fixed before merge by enforcing human `subjectCode` to match `profile.pseudonymizedSubjectCode` in API and domain validation.
 
 ### OS-006: Facility and housing API module
 
