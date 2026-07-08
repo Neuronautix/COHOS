@@ -1,0 +1,15 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./apps/api" },
+    { "path": "./packages/audit" },
+    { "path": "./packages/connectors" },
+    { "path": "./packages/db" },
+    { "path": "./packages/domain" },
+    { "path": "./packages/isa" },
+    { "path": "./packages/qr" },
+    { "path": "./packages/reporting" },
+    { "path": "./packages/rules" },
+    { "path": "./packages/ui" }
+  ]
+}
