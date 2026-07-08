@@ -58,7 +58,7 @@ Unsafe parallel work:
 | OS-003 | Database schema and synthetic seed data                | Completed locally | L          | Strongly coupled |
 | OS-004 | API application skeleton and health endpoint           | Completed locally | M          | Strongly coupled |
 | OS-005 | Subject API module                                     | Completed locally | M          | Strongly coupled |
-| OS-006 | Facility and housing API module                        | Pending           | M          | Strongly coupled |
+| OS-006 | Facility and housing API module                        | Completed locally | M          | Strongly coupled |
 | OS-007 | Investigation, study, and assay API module             | Pending           | M          | Strongly coupled |
 | OS-008 | Event and audit model                                  | Pending           | L          | Strongly coupled |
 | OS-009 | Welfare and environmental rule engine                  | Pending           | M          | Weakly coupled   |
@@ -258,6 +258,16 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: Medium.
 - Token-optimization strategy: Keep hierarchy endpoints read-focused initially; defer complex location mutation to event/audit ticket.
+- Branch: `feat/OS-006-facility-housing-api-module`.
+- Validation performed:
+  - `pnpm --filter @cohos/domain typecheck`
+  - `pnpm --filter @cohos/domain build`
+  - `pnpm --filter @cohos/api typecheck`
+  - `pnpm test -- apps/api/src/facilities/facilities.controller.test.ts packages/domain/src/index.test.ts`
+  - Full root validation before PR
+- Validation result: Passed local API/domain focused validation and full root validation.
+- Risks: Facility and housing data are served from in-memory synthetic fixtures; Prisma persistence and transfer/environmental mutation paths remain deferred to later event/audit work.
+- Review result: Self-review passed locally. Subagent OS-006 review found a PR packaging blocker because new facility files were untracked and a non-blocking pasture occupant coverage gap; fixed before PR by explicitly staging the new module and adding pasture detail coverage.
 
 ### OS-007: Investigation, study, and assay API module
 
