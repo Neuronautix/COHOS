@@ -15,6 +15,7 @@
     "format:check": "prettier --check .",
     "lint": "pnpm --filter @cohos/db prisma:generate && eslint . --max-warnings=0",
     "test": "vitest run",
+    "test:forbidden-names": "node scripts/check-forbidden-legacy-names.mjs",
     "typecheck": "pnpm --filter @cohos/db prisma:generate && tsc -b --pretty false && pnpm --filter @cohos/web typecheck"
   },
   "devDependencies": {
