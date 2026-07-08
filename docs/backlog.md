@@ -64,7 +64,7 @@ Unsafe parallel work:
 | OS-009 | Welfare and environmental rule engine                  | Completed locally | M          | Weakly coupled   |
 | OS-010 | ISA-JSON export skeleton                               | Completed locally | M          | Weakly coupled   |
 | OS-011 | Connector interfaces and Metadatapp connector skeleton | Completed locally | M          | Weakly coupled   |
-| OS-012 | QR token and scan workflow skeleton                    | Pending           | M          | Weakly coupled   |
+| OS-012 | QR token and scan workflow skeleton                    | Completed locally | M          | Weakly coupled   |
 | OS-013 | Web app shell and navigation                           | Pending           | M          | Strongly coupled |
 | OS-014 | Subject list, detail, and model-specific views         | Pending           | M          | Strongly coupled |
 | OS-015 | Facility layout and housing detail views               | Pending           | M          | Strongly coupled |
@@ -415,7 +415,7 @@ Unsafe parallel work:
 
 - Objective: Implement typed QR token and quick action scan contracts.
 - Scope: Token schema, target entity typing, expiry and revocation semantics, scan route contract, quick action intent types, tests.
-- Affected files/modules: `packages/qr/src/**`, `packages/domain/src/qr/**`, `apps/api/src/qr/**`, `docs/qr-workflows.md`.
+- Affected files/modules: `packages/qr/src/**`, `packages/domain/src/qr.ts`, `apps/api/src/qr/**`, `apps/api/src/app.module.ts`, `apps/api/package.json`, `apps/api/tsconfig.json`, `docs/qr-workflows.md`.
 - Acceptance criteria:
   - QR tokens include purpose, target type, target id, expiry, revocation status, and created metadata.
   - Permanent unrestricted tokens are not supported.
@@ -427,6 +427,18 @@ Unsafe parallel work:
 - Recommended model: GPT-5 Codex.
 - Recommended effort level: High.
 - Token-optimization strategy: Implement deterministic token validation utilities first; defer QR image generation and auth integration.
+- Branch: `feat/OS-012-qr-scan-workflow`.
+- Validation performed:
+  - `pnpm --filter @cohos/domain build`
+  - `pnpm --filter @cohos/qr typecheck`
+  - `pnpm --filter @cohos/qr build`
+  - `pnpm --filter @cohos/api typecheck`
+  - `pnpm test -- packages/qr/src/index.test.ts apps/api/src/qr/qr.controller.test.ts`
+  - Full root validation before PR
+  - Forbidden legacy name scan
+- Validation result: Passed local domain/QR/API focused validation, full root validation, and forbidden-name scan.
+- Risks: QR token persistence, authenticated scan authorization, generated QR images, and audit-backed revocation storage remain deferred; API routes are fixture-backed for the workflow skeleton.
+- Review result: Self-review passed locally; subagent review was unavailable due account usage limits.
 
 ### OS-013: Web app shell and navigation
 
