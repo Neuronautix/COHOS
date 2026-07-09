@@ -4,10 +4,13 @@ import Link from 'next/link';
 
 import { MetricTile, PageHeader, StatusBadge, WorkspacePanel } from '@cohos/ui';
 import { useQuery } from '@tanstack/react-query';
+import { ArrowRight } from 'lucide-react';
 
 import { fetchSubject } from './subject-api';
 import {
   formatToken,
+  getSubjectAggregateKindLabel,
+  getSubjectAggregateKindTone,
   getSubjectDisplayCode,
   getSubjectLocationLabel,
   getSubjectProfileFields,
@@ -58,6 +61,7 @@ export function SubjectDetail({ subjectId }: SubjectDetailProps) {
   }
 
   const displayCode = getSubjectDisplayCode(subject);
+  const aggregateMemberships = subject.aggregateMemberships ?? [];
 
   return (
     <div className="subject-page">
@@ -132,6 +136,43 @@ export function SubjectDetail({ subjectId }: SubjectDetailProps) {
               <p>{getSubjectLocationLabel(subject)}</p>
             </article>
           </div>
+        </WorkspacePanel>
+
+        <WorkspacePanel title={`Batch, group, and cohort links (${aggregateMemberships.length})`}>
+          {aggregateMemberships.length === 0 ? (
+            <div className="inline-empty-state">
+              <h3>No aggregate memberships</h3>
+              <p>This subject is not linked to a batch, group, or cohort in the API response.</p>
+            </div>
+          ) : (
+            <div className="research-card-list">
+              {aggregateMemberships.map((membership) => (
+                <article
+                  className="research-card-list__item"
+                  key={`${membership.aggregateId}-${membership.role}`}
+                >
+                  <div>
+                    <h3>{membership.aggregateCode ?? membership.aggregateId}</h3>
+                    <p>
+                      {membership.aggregateName ?? membership.aggregateId} -{' '}
+                      {formatToken(membership.role)}
+                      {membership.count === undefined ? '' : `, count ${membership.count}`}
+                    </p>
+                  </div>
+                  <StatusBadge tone={getSubjectAggregateKindTone(membership.aggregateKind)}>
+                    {getSubjectAggregateKindLabel(membership.aggregateKind)}
+                  </StatusBadge>
+                  <Link
+                    className="icon-link"
+                    href={`/subjects/aggregates/${membership.aggregateId}`}
+                  >
+                    <span>Open</span>
+                    <ArrowRight aria-hidden="true" size={16} />
+                  </Link>
+                </article>
+              ))}
+            </div>
+          )}
         </WorkspacePanel>
       </div>
     </div>

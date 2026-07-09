@@ -63,6 +63,11 @@ export function SubjectList() {
   return (
     <div className="subject-page">
       <PageHeader
+        actions={
+          <Link className="action-link" href="/subjects/aggregates">
+            Batch / Group / Cohort
+          </Link>
+        }
         eyebrow="Registry"
         summary="API-backed subject registry with model-specific status, housing, and welfare context."
         title="Subjects"

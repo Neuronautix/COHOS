@@ -1,4 +1,6 @@
 import type {
+  SubjectAggregate,
+  SubjectAggregateKind,
   SubjectAggregateMembership,
   SubjectProfileType,
   SubjectWithProfile,
@@ -18,7 +20,16 @@ export type SubjectListSummary = {
   readonly totalSubjects: number;
 };
 
+export type SubjectAggregateSummary = {
+  readonly activeAggregates: number;
+  readonly batches: number;
+  readonly cohorts: number;
+  readonly groups: number;
+  readonly totalAggregates: number;
+};
+
 type SubjectStatus = SubjectWithProfile['status'];
+type SubjectAggregateStatus = SubjectAggregate['status'];
 
 export const subjectProfileLabels = {
   farm_animal: 'Farm animal',
@@ -27,6 +38,12 @@ export const subjectProfileLabels = {
   rodent: 'Rodent subject',
   zebrafish_batch: 'Zebrafish batch',
 } satisfies Record<SubjectProfileType, string>;
+
+export const subjectAggregateKindLabels = {
+  batch: 'Batch',
+  cohort: 'Cohort',
+  group: 'Group',
+} satisfies Record<SubjectAggregateKind, string>;
 
 export function formatToken(value: string): string {
   return value
@@ -45,6 +62,37 @@ export function getSubjectDisplayCode(subject: SubjectWithProfile): string {
 
 export function getSubjectProfileLabel(subject: SubjectWithProfile): string {
   return subjectProfileLabels[subject.profileType];
+}
+
+export function getSubjectAggregateKindLabel(kind: SubjectAggregateKind): string {
+  return subjectAggregateKindLabels[kind];
+}
+
+export function getSubjectAggregateLabel(aggregate: SubjectAggregate): string {
+  return `${getSubjectAggregateKindLabel(aggregate.kind)} ${aggregate.code}`;
+}
+
+export function getSubjectAggregateKindTone(kind: SubjectAggregateKind): StatusTone {
+  switch (kind) {
+    case 'batch':
+      return 'info';
+    case 'group':
+      return 'success';
+    case 'cohort':
+      return 'warning';
+  }
+}
+
+export function getSubjectAggregateStatusTone(status: SubjectAggregateStatus): StatusTone {
+  switch (status) {
+    case 'active':
+      return 'success';
+    case 'planned':
+      return 'info';
+    case 'closed':
+    case 'archived':
+      return 'neutral';
+  }
 }
 
 export function getSubjectSpeciesLabel(subject: SubjectWithProfile): string {
@@ -132,6 +180,78 @@ function getSubjectAggregateFieldValue(subject: SubjectWithProfile): string {
 
 function getSubjectAggregateFields(subject: SubjectWithProfile): SubjectField[] {
   return [subjectField('Aggregate memberships', getSubjectAggregateFieldValue(subject))];
+}
+
+export function getSubjectAggregateDetailFields(aggregate: SubjectAggregate): SubjectField[] {
+  const baseFields = [
+    subjectField('Code', aggregate.code),
+    subjectField('Name', aggregate.name),
+    subjectField('Kind', getSubjectAggregateKindLabel(aggregate.kind)),
+    subjectField('Status', formatToken(aggregate.status)),
+    subjectField('Subject count', aggregate.subjectIds.length.toString()),
+    subjectField(
+      'Profile types',
+      aggregate.profileTypes.length === 0
+        ? 'Not restricted'
+        : aggregate.profileTypes.map((profileType) => subjectProfileLabels[profileType]).join(', '),
+    ),
+    subjectField('Species', aggregate.speciesId ?? 'Not restricted'),
+    subjectField('Valid from', aggregate.validFrom ?? 'Not recorded'),
+    subjectField('Valid to', aggregate.validTo ?? 'Open'),
+  ];
+
+  switch (aggregate.kind) {
+    case 'batch':
+      return [
+        ...baseFields,
+        subjectField('Origin type', formatToken(aggregate.batch.originType)),
+        subjectField('Initial count', aggregate.batch.initialCount.toString()),
+        subjectField('Current count', aggregate.batch.currentCount?.toString() ?? 'Not recorded'),
+        subjectField('Count unit', formatToken(aggregate.batch.countUnit)),
+        subjectField(
+          'Developmental stage',
+          aggregate.batch.developmentalStage === undefined
+            ? 'Not recorded'
+            : formatToken(aggregate.batch.developmentalStage),
+        ),
+        subjectField('Source organization', aggregate.batch.sourceOrganization ?? 'Not recorded'),
+      ];
+    case 'group':
+      return [
+        ...baseFields,
+        subjectField('Purpose', formatToken(aggregate.group.groupPurpose)),
+        subjectField('Housing unit', aggregate.group.housingUnitId ?? 'Not assigned'),
+        subjectField('Membership policy', formatToken(aggregate.group.membershipPolicy)),
+        subjectField('Husbandry protocol', aggregate.group.husbandryProtocolId ?? 'Not recorded'),
+        subjectField('Diet', aggregate.group.diet ?? 'Not recorded'),
+        subjectField(
+          'Density',
+          aggregate.group.density === undefined
+            ? 'Not recorded'
+            : `${aggregate.group.density.value} ${aggregate.group.density.unit}`,
+        ),
+      ];
+    case 'cohort':
+      return [
+        ...baseFields,
+        subjectField('Cohort kind', formatToken(aggregate.cohort.cohortKind)),
+        subjectField('Study', aggregate.cohort.studyId ?? 'Not linked'),
+        subjectField('Planned size', aggregate.cohort.plannedSize?.toString() ?? 'Not recorded'),
+        subjectField('Blinding', formatToken(aggregate.cohort.blinding)),
+        subjectField(
+          'Randomization unit',
+          aggregate.cohort.randomizationUnit === undefined
+            ? 'Not recorded'
+            : formatToken(aggregate.cohort.randomizationUnit),
+        ),
+        subjectField(
+          'Follow-up',
+          aggregate.cohort.followUpSchedule.length === 0
+            ? 'Not recorded'
+            : aggregate.cohort.followUpSchedule.join(', '),
+        ),
+      ];
+  }
 }
 
 export function getSubjectProfileFields(subject: SubjectWithProfile): SubjectField[] {
@@ -226,6 +346,18 @@ export function summarizeSubjects(subjects: readonly SubjectWithProfile[]): Subj
   };
 }
 
+export function summarizeSubjectAggregates(
+  aggregates: readonly SubjectAggregate[],
+): SubjectAggregateSummary {
+  return {
+    activeAggregates: aggregates.filter((aggregate) => aggregate.status === 'active').length,
+    batches: aggregates.filter((aggregate) => aggregate.kind === 'batch').length,
+    cohorts: aggregates.filter((aggregate) => aggregate.kind === 'cohort').length,
+    groups: aggregates.filter((aggregate) => aggregate.kind === 'group').length,
+    totalAggregates: aggregates.length,
+  };
+}
+
 export function matchesSubjectSearch(subject: SubjectWithProfile, searchTerm: string): boolean {
   const normalizedSearchTerm = searchTerm.trim().toLowerCase();
 
@@ -240,6 +372,31 @@ export function matchesSubjectSearch(subject: SubjectWithProfile, searchTerm: st
     getSubjectSpeciesLabel(subject),
     getSubjectLocationLabel(subject),
     ...(subject.aggregateMemberships ?? []).map(getSubjectAggregateMembershipLabel),
+  ]
+    .join(' ')
+    .toLowerCase()
+    .includes(normalizedSearchTerm);
+}
+
+export function matchesSubjectAggregateSearch(
+  aggregate: SubjectAggregate,
+  searchTerm: string,
+): boolean {
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+
+  if (normalizedSearchTerm.length === 0) {
+    return true;
+  }
+
+  return [
+    aggregate.code,
+    aggregate.name,
+    aggregate.description ?? '',
+    getSubjectAggregateKindLabel(aggregate.kind),
+    aggregate.status,
+    aggregate.speciesId ?? '',
+    ...aggregate.profileTypes.map((profileType) => subjectProfileLabels[profileType]),
+    ...aggregate.subjectIds,
   ]
     .join(' ')
     .toLowerCase()
