@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Query } from '@nestjs/common';
 
 import { ZodValidationPipe } from '../common/zod-validation.pipe.js';
 import {
@@ -15,7 +15,7 @@ import { EventsService } from './events.service.js';
 
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(@Inject(EventsService) private readonly eventsService: EventsService) {}
 
   @Get()
   listEvents(
@@ -76,7 +76,7 @@ export class EventsController {
 
 @Controller('audit-events')
 export class AuditEventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(@Inject(EventsService) private readonly eventsService: EventsService) {}
 
   @Get()
   listAuditEvents(
@@ -95,7 +95,7 @@ export class AuditEventsController {
 
 @Controller('alerts')
 export class AlertsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(@Inject(EventsService) private readonly eventsService: EventsService) {}
 
   @Get()
   listAlerts() {

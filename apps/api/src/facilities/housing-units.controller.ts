@@ -1,10 +1,10 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Inject, Param } from '@nestjs/common';
 
 import { FacilitiesService } from './facilities.service.js';
 
 @Controller('housing-units')
 export class HousingUnitsController {
-  constructor(private readonly facilitiesService: FacilitiesService) {}
+  constructor(@Inject(FacilitiesService) private readonly facilitiesService: FacilitiesService) {}
 
   @Get(':housingUnitId')
   getHousingUnit(@Param('housingUnitId') housingUnitId: string) {

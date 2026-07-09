@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import {
   type ConnectorConfig,
@@ -32,7 +32,7 @@ export class ConnectorsService {
     connectorConfigFixtures.map((config) => [config.id, config]),
   );
 
-  constructor(private readonly researchService: ResearchService) {}
+  constructor(@Inject(ResearchService) private readonly researchService: ResearchService) {}
 
   listConnectors(): ConnectorConfig[] {
     return Array.from(this.connectors.values());

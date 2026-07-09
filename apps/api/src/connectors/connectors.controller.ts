@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Patch, Post } from '@nestjs/common';
 
 import {
   metadatappConnectorSettingsUpdateSchema,
@@ -10,7 +10,7 @@ import { ConnectorsService } from './connectors.service.js';
 
 @Controller('connectors')
 export class ConnectorsController {
-  constructor(private readonly connectorsService: ConnectorsService) {}
+  constructor(@Inject(ConnectorsService) private readonly connectorsService: ConnectorsService) {}
 
   @Get()
   listConnectors() {

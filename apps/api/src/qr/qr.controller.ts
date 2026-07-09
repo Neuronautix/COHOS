@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 
 import { ZodValidationPipe } from '../common/zod-validation.pipe.js';
 import { qrScanRequestSchema, type QRScanRequestDto } from './dto.js';
@@ -6,7 +6,7 @@ import { QRService } from './qr.service.js';
 
 @Controller('qr')
 export class QRController {
-  constructor(private readonly qrService: QRService) {}
+  constructor(@Inject(QRService) private readonly qrService: QRService) {}
 
   @Get('tokens')
   listTokens() {

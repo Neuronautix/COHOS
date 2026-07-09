@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 
 import { ZodValidationPipe } from '../common/zod-validation.pipe.js';
 import { createSubjectSchema, type CreateSubjectDto } from './dto.js';
@@ -6,7 +6,7 @@ import { SubjectsService } from './subjects.service.js';
 
 @Controller('subjects')
 export class SubjectsController {
-  constructor(private readonly subjectsService: SubjectsService) {}
+  constructor(@Inject(SubjectsService) private readonly subjectsService: SubjectsService) {}
 
   @Get()
   listSubjects() {

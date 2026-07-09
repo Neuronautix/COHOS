@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Query } from '@nestjs/common';
 
 import { ZodValidationPipe } from '../common/zod-validation.pipe.js';
 import {
@@ -15,7 +15,7 @@ import { ResearchService } from './research.service.js';
 
 @Controller('research')
 export class ResearchController {
-  constructor(private readonly researchService: ResearchService) {}
+  constructor(@Inject(ResearchService) private readonly researchService: ResearchService) {}
 
   @Get('vocabulary')
   getVocabulary() {
@@ -25,7 +25,7 @@ export class ResearchController {
 
 @Controller('investigations')
 export class InvestigationsController {
-  constructor(private readonly researchService: ResearchService) {}
+  constructor(@Inject(ResearchService) private readonly researchService: ResearchService) {}
 
   @Get()
   listInvestigations() {
@@ -53,7 +53,7 @@ export class InvestigationsController {
 
 @Controller('studies')
 export class StudiesController {
-  constructor(private readonly researchService: ResearchService) {}
+  constructor(@Inject(ResearchService) private readonly researchService: ResearchService) {}
 
   @Get(':studyId')
   getStudy(@Param('studyId') studyId: string) {
@@ -76,7 +76,7 @@ export class StudiesController {
 
 @Controller('assays')
 export class AssaysController {
-  constructor(private readonly researchService: ResearchService) {}
+  constructor(@Inject(ResearchService) private readonly researchService: ResearchService) {}
 
   @Get(':assayId')
   getAssay(@Param('assayId') assayId: string) {
@@ -99,7 +99,7 @@ export class AssaysController {
 
 @Controller('procedures')
 export class ProceduresController {
-  constructor(private readonly researchService: ResearchService) {}
+  constructor(@Inject(ResearchService) private readonly researchService: ResearchService) {}
 
   @Get(':procedureId')
   getProcedure(@Param('procedureId') procedureId: string) {
@@ -117,7 +117,7 @@ export class ProceduresController {
 
 @Controller('connected-resource-links')
 export class ConnectedResourceLinksController {
-  constructor(private readonly researchService: ResearchService) {}
+  constructor(@Inject(ResearchService) private readonly researchService: ResearchService) {}
 
   @Get()
   listConnectedResourceLinks(
