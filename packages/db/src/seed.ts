@@ -1,4 +1,4 @@
-import { PrismaClient } from './generated/prisma/index.js';
+import { PrismaClient, type Prisma } from './generated/prisma/index.js';
 
 import { syntheticSeedData } from './seed-data.js';
 
@@ -10,6 +10,14 @@ function toDate(value: string | undefined) {
 
 function optionalString(value: unknown) {
   return typeof value === 'string' ? value : undefined;
+}
+
+function toJson(value: unknown): Prisma.InputJsonValue {
+  return value as Prisma.InputJsonValue;
+}
+
+function optionalJson<T>(value: T | undefined): Prisma.InputJsonValue | undefined {
+  return value === undefined ? undefined : toJson(value);
 }
 
 async function main() {
@@ -124,6 +132,42 @@ async function main() {
       volumeLiters: 12,
     },
   });
+
+  for (const aggregate of syntheticSeedData.subjectAggregates) {
+    await prisma.subjectAggregate.upsert({
+      where: { id: aggregate.id },
+      update: {
+        name: aggregate.name,
+        description: aggregate.description,
+        profileTypes: [...aggregate.profileTypes],
+        speciesId: aggregate.speciesId,
+        status: aggregate.status,
+        validFrom: toDate(aggregate.validFrom),
+        validTo: toDate(aggregate.validTo),
+        metadata: toJson(aggregate.metadata),
+        batchMetadata: optionalJson(aggregate.kind === 'batch' ? aggregate.batch : undefined),
+        groupMetadata: optionalJson(aggregate.kind === 'group' ? aggregate.group : undefined),
+        cohortMetadata: optionalJson(aggregate.kind === 'cohort' ? aggregate.cohort : undefined),
+      },
+      create: {
+        id: aggregate.id,
+        organizationId: aggregate.organizationId,
+        kind: aggregate.kind,
+        code: aggregate.code,
+        name: aggregate.name,
+        description: aggregate.description,
+        profileTypes: [...aggregate.profileTypes],
+        speciesId: aggregate.speciesId,
+        status: aggregate.status,
+        validFrom: toDate(aggregate.validFrom),
+        validTo: toDate(aggregate.validTo),
+        metadata: toJson(aggregate.metadata),
+        batchMetadata: optionalJson(aggregate.kind === 'batch' ? aggregate.batch : undefined),
+        groupMetadata: optionalJson(aggregate.kind === 'group' ? aggregate.group : undefined),
+        cohortMetadata: optionalJson(aggregate.kind === 'cohort' ? aggregate.cohort : undefined),
+      },
+    });
+  }
 
   for (const cohort of syntheticSeedData.cohorts) {
     await prisma.cohort.upsert({
@@ -281,6 +325,33 @@ async function main() {
         },
       });
     }
+  }
+
+  for (const membership of syntheticSeedData.subjectAggregateMemberships) {
+    await prisma.subjectAggregateMembership.upsert({
+      where: {
+        subjectId_aggregateId_role: {
+          subjectId: membership.subjectId,
+          aggregateId: membership.aggregateId,
+          role: membership.role,
+        },
+      },
+      update: {
+        validFrom: toDate(membership.validFrom),
+        validTo: toDate(membership.validTo),
+        count: membership.count,
+        metadata: toJson(membership.metadata),
+      },
+      create: {
+        subjectId: membership.subjectId,
+        aggregateId: membership.aggregateId,
+        role: membership.role,
+        validFrom: toDate(membership.validFrom),
+        validTo: toDate(membership.validTo),
+        count: membership.count,
+        metadata: toJson(membership.metadata),
+      },
+    });
   }
 
   await prisma.investigation.upsert({

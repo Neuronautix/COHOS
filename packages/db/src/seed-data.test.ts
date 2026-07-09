@@ -9,6 +9,8 @@ import {
   eventSchema,
   qrTokenSchema,
   speciesSchema,
+  subjectAggregateMembershipSchema,
+  subjectAggregateSchema,
   subjectWithProfileSchema,
 } from '@cohos/domain';
 import { describe, expect, it } from 'vitest';
@@ -44,6 +46,20 @@ describe('synthetic seed data', () => {
     for (const subject of syntheticSeedData.subjects) {
       expect(subjectWithProfileSchema.safeParse(subject).success).toBe(true);
     }
+  });
+
+  it('validates subject aggregate and membership fixtures through domain schemas', () => {
+    for (const aggregate of syntheticSeedData.subjectAggregates) {
+      expect(subjectAggregateSchema.safeParse(aggregate).success).toBe(true);
+    }
+
+    for (const membership of syntheticSeedData.subjectAggregateMemberships) {
+      expect(subjectAggregateMembershipSchema.safeParse(membership).success).toBe(true);
+    }
+
+    expect(syntheticSeedData.subjectAggregates.map((aggregate) => aggregate.kind)).toEqual(
+      expect.arrayContaining(['batch', 'group', 'cohort']),
+    );
   });
 
   it('keeps human participant fixtures pseudonymized', () => {

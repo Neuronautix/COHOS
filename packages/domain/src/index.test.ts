@@ -20,6 +20,11 @@ import {
   rodentSubjectProfileSchema,
   roomSchema,
   ruleAlertSchema,
+  subjectAggregateBehaviorByProfileType,
+  subjectAggregateMembershipSchema,
+  subjectBatchAggregateSchema,
+  subjectCohortAggregateSchema,
+  subjectGroupAggregateSchema,
   subjectEventStateSchema,
   studyDetailSchema,
   studySchema,
@@ -220,6 +225,87 @@ describe('subject profile schemas', () => {
         count: -1,
       }).success,
     ).toBe(false);
+  });
+
+  it('validates batch, group, and cohort aggregate metadata separately', () => {
+    const batch = subjectBatchAggregateSchema.parse({
+      id: 'batch-zebrafish-spawn-test',
+      organizationId: 'org-1',
+      kind: 'batch',
+      code: 'BATCH-ZF-TEST',
+      name: 'Zebrafish spawn test batch',
+      profileTypes: ['zebrafish_batch'],
+      speciesId: zebrafishSpecies.id,
+      subjectIds: ['subject-zebrafish-batch-1'],
+      batch: {
+        originType: 'spawn',
+        spawnDate: '2026-03-01',
+        hatchDate: '2026-03-04',
+        developmentalStage: 'larva',
+        initialCount: 120,
+        currentCount: 116,
+        countUnit: 'larvae',
+      },
+    });
+    const group = subjectGroupAggregateSchema.parse({
+      id: 'group-rodent-cage-test',
+      organizationId: 'org-1',
+      kind: 'group',
+      code: 'GROUP-ROD-TEST',
+      name: 'Rodent cage test group',
+      profileTypes: ['rodent'],
+      speciesId: mouseSpecies.id,
+      subjectIds: ['subject-rodent-1'],
+      group: {
+        groupPurpose: 'housing',
+        housingUnitId: 'housing-cage-1',
+        membershipPolicy: 'dynamic',
+      },
+    });
+    const cohort = subjectCohortAggregateSchema.parse({
+      id: 'cohort-test',
+      organizationId: 'org-1',
+      kind: 'cohort',
+      code: 'COHORT-TEST',
+      name: 'Synthetic cohort test',
+      profileTypes: ['human'],
+      subjectIds: ['subject-human-1'],
+      cohort: {
+        cohortKind: 'observational',
+        studyId: 'study-1',
+        inclusionCriteria: ['Consented participant'],
+        exclusionCriteria: ['Withdrawn consent'],
+        plannedSize: 20,
+      },
+    });
+    const membership = subjectAggregateMembershipSchema.parse({
+      subjectId: 'subject-rodent-1',
+      aggregateId: 'group-rodent-cage-test',
+      aggregateKind: 'group',
+      aggregateCode: 'GROUP-ROD-TEST',
+      role: 'housing_member',
+      validFrom: '2026-03-01',
+    });
+
+    expect(batch.batch.originType).toBe('spawn');
+    expect(group.group.groupPurpose).toBe('housing');
+    expect(cohort.cohort.cohortKind).toBe('observational');
+    expect(cohort.cohort.blinding).toBe('not_recorded');
+    expect(membership.metadata).toEqual({});
+  });
+
+  it('documents aggregate behavior by subject category', () => {
+    expect(subjectAggregateBehaviorByProfileType.human.primaryAggregateKinds).toEqual(['cohort']);
+    expect(subjectAggregateBehaviorByProfileType.rodent.primaryAggregateKinds).toEqual([
+      'batch',
+      'group',
+      'cohort',
+    ]);
+    expect(subjectAggregateBehaviorByProfileType.zebrafish_batch.subjectUnit).toBe('counted_batch');
+    expect(subjectAggregateBehaviorByProfileType.generic.primaryAggregateKinds).toEqual([
+      'batch',
+      'cohort',
+    ]);
   });
 });
 

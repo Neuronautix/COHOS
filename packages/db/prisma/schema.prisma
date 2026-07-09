@@ -22,6 +22,19 @@ enum SubjectStatus {
   archived
 }
 
+enum SubjectAggregateKind {
+  batch
+  group
+  cohort
+}
+
+enum SubjectAggregateStatus {
+  planned
+  active
+  closed
+  archived
+}
+
 enum HousingUnitType {
   cage
   tank
@@ -78,6 +91,7 @@ model Organization {
   roles                Role[]
   species              Species[]
   subjects             Subject[]
+  subjectAggregates    SubjectAggregate[]
   cohorts              Cohort[]
   facilities           Facility[]
   investigations       Investigation[]
@@ -132,20 +146,21 @@ model UserRole {
 }
 
 model Species {
-  id                   String                  @id
-  organizationId       String
-  organization         Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  commonName           String
-  scientificName       String
-  ncbiTaxonId          String?
-  subjects             Subject[]
-  lines                Line[]
-  strains              Strain[]
-  rodentProfiles       RodentSubjectProfile[]
-  zebrafishProfiles    ZebrafishBatchProfile[]
-  farmAnimalProfiles   FarmAnimalProfile[]
-  genericProfiles      GenericSubjectProfile[]
-  createdAt            DateTime                @default(now())
+  id                 String                  @id
+  organizationId     String
+  organization       Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  commonName         String
+  scientificName     String
+  ncbiTaxonId        String?
+  subjects           Subject[]
+  lines              Line[]
+  strains            Strain[]
+  rodentProfiles     RodentSubjectProfile[]
+  zebrafishProfiles  ZebrafishBatchProfile[]
+  farmAnimalProfiles FarmAnimalProfile[]
+  genericProfiles    GenericSubjectProfile[]
+  subjectAggregates  SubjectAggregate[]
+  createdAt          DateTime                @default(now())
 
   @@index([organizationId])
   @@index([ncbiTaxonId])
@@ -183,27 +198,28 @@ model Genotype {
 }
 
 model Subject {
-  id                String                  @id
-  organizationId    String
-  organization      Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  subjectCode       String
-  profileType       SubjectProfileType
-  status            SubjectStatus           @default(active)
-  speciesId         String?
-  species           Species?                @relation(fields: [speciesId], references: [id])
-  cohortId          String?
-  cohort            Cohort?                 @relation(fields: [cohortId], references: [id])
-  subjectProfile    SubjectProfile?
-  humanProfile      HumanSubjectProfile?
-  rodentProfile     RodentSubjectProfile?
-  zebrafishProfile  ZebrafishBatchProfile?
-  farmAnimalProfile FarmAnimalProfile?
-  genericProfile    GenericSubjectProfile?
-  events            Event[]
-  samples           Sample[]
-  studySubjects     StudySubject[]
-  createdAt         DateTime                @default(now())
-  updatedAt         DateTime                @updatedAt
+  id                   String                       @id
+  organizationId       String
+  organization         Organization                 @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  subjectCode          String
+  profileType          SubjectProfileType
+  status               SubjectStatus                @default(active)
+  speciesId            String?
+  species              Species?                     @relation(fields: [speciesId], references: [id])
+  cohortId             String?
+  cohort               Cohort?                      @relation(fields: [cohortId], references: [id])
+  subjectProfile       SubjectProfile?
+  humanProfile         HumanSubjectProfile?
+  rodentProfile        RodentSubjectProfile?
+  zebrafishProfile     ZebrafishBatchProfile?
+  farmAnimalProfile    FarmAnimalProfile?
+  genericProfile       GenericSubjectProfile?
+  events               Event[]
+  samples              Sample[]
+  studySubjects        StudySubject[]
+  aggregateMemberships SubjectAggregateMembership[]
+  createdAt            DateTime                     @default(now())
+  updatedAt            DateTime                     @updatedAt
 
   @@unique([organizationId, subjectCode])
   @@index([organizationId, profileType])
@@ -222,10 +238,10 @@ model SubjectProfile {
 }
 
 model HumanSubjectProfile {
-  id                       String   @id
-  subjectId                String   @unique
-  subject                  Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  pseudonymizedSubjectCode String   @unique
+  id                       String  @id
+  subjectId                String  @unique
+  subject                  Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  pseudonymizedSubjectCode String  @unique
   consentStatus            String
   studyParticipationStatus String
   ageBand                  String?
@@ -306,10 +322,53 @@ model GenericSubjectProfile {
   extensibilityNotes String?
 }
 
-model Cohort {
-  id             String       @id
+model SubjectAggregate {
+  id             String                       @id
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization                 @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  kind           SubjectAggregateKind
+  code           String
+  name           String
+  description    String?
+  profileTypes   SubjectProfileType[]
+  speciesId      String?
+  species        Species?                     @relation(fields: [speciesId], references: [id])
+  status         SubjectAggregateStatus       @default(active)
+  validFrom      DateTime?
+  validTo        DateTime?
+  metadata       Json
+  batchMetadata  Json?
+  groupMetadata  Json?
+  cohortMetadata Json?
+  memberships    SubjectAggregateMembership[]
+  createdAt      DateTime                     @default(now())
+  updatedAt      DateTime                     @updatedAt
+
+  @@unique([organizationId, code])
+  @@index([organizationId, kind])
+  @@index([speciesId])
+}
+
+model SubjectAggregateMembership {
+  subjectId   String
+  aggregateId String
+  role        String
+  validFrom   DateTime?
+  validTo     DateTime?
+  count       Int?
+  metadata    Json
+  subject     Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  aggregate   SubjectAggregate @relation(fields: [aggregateId], references: [id], onDelete: Cascade)
+  createdAt   DateTime         @default(now())
+
+  @@id([subjectId, aggregateId, role])
+  @@index([aggregateId])
+}
+
+model Cohort {
+  id             String        @id
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   name           String
   description    String?
   subjects       Subject[]
@@ -353,22 +412,22 @@ model Rack {
 }
 
 model HousingUnit {
-  id                      String                  @id
-  roomId                  String
-  room                    Room                    @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  rackId                  String?
-  rack                    Rack?                   @relation(fields: [rackId], references: [id])
-  type                    HousingUnitType
-  name                    String
-  code                    String
-  cage                    Cage?
-  tank                    Tank?
-  rodentProfiles          RodentSubjectProfile[]
-  zebrafishBatchProfiles  ZebrafishBatchProfile[]
-  farmAnimalProfiles      FarmAnimalProfile[]
-  events                  Event[]
-  transferEventsFrom      TransferEvent[]         @relation("TransferFromHousing")
-  transferEventsTo        TransferEvent[]         @relation("TransferToHousing")
+  id                     String                  @id
+  roomId                 String
+  room                   Room                    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  rackId                 String?
+  rack                   Rack?                   @relation(fields: [rackId], references: [id])
+  type                   HousingUnitType
+  name                   String
+  code                   String
+  cage                   Cage?
+  tank                   Tank?
+  rodentProfiles         RodentSubjectProfile[]
+  zebrafishBatchProfiles ZebrafishBatchProfile[]
+  farmAnimalProfiles     FarmAnimalProfile[]
+  events                 Event[]
+  transferEventsFrom     TransferEvent[]         @relation("TransferFromHousing")
+  transferEventsTo       TransferEvent[]         @relation("TransferToHousing")
 
   @@unique([roomId, code])
   @@index([rackId])
@@ -527,25 +586,25 @@ model MortalityEvent {
 }
 
 model WelfareObservation {
-  id      String @id
-  eventId String @unique
-  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  id      String  @id
+  eventId String  @unique
+  event   Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   score   Int
   status  String
   notes   String?
 }
 
 model EnvironmentalObservation {
-  id      String @id
-  eventId String @unique
-  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  id      String  @id
+  eventId String  @unique
+  event   Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   metric  String
   value   Decimal
   unit    String
 }
 
 model AuditEvent {
-  id            String       @id
+  id             String       @id
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   actorUserId    String

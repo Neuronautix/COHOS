@@ -33,6 +33,16 @@ const rodentSubject = subjectWithProfileSchema.parse({
   profileType: 'rodent',
   status: 'active',
   speciesId: 'species-mus-musculus',
+  aggregateMemberships: [
+    {
+      subjectId: 'subject-rodent-101',
+      aggregateId: 'batch-rodent-test-101',
+      aggregateKind: 'batch',
+      aggregateCode: 'BATCH-ROD-TEST-101',
+      role: 'source',
+      validFrom: '2026-02-15',
+    },
+  ],
   profile: {
     profileType: 'rodent',
     species: {
@@ -73,6 +83,10 @@ describe('subject formatters', () => {
         {
           label: 'Housing unit',
           value: 'housing-cage-a1',
+        },
+        {
+          label: 'Aggregate memberships',
+          value: 'Batch: BATCH-ROD-TEST-101',
         },
       ]),
     );

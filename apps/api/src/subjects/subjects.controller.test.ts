@@ -30,6 +30,7 @@ describe('SubjectsController', () => {
   it('lists pseudonymized subjects for all supported models', async () => {
     const response = await fetch(`${await baseUrl()}/subjects`);
     const subjects = (await response.json()) as Array<{
+      readonly aggregateMemberships?: Array<{ readonly aggregateKind?: string }>;
       readonly profileType?: string;
       readonly profile?: Record<string, unknown>;
     }>;
@@ -48,6 +49,12 @@ describe('SubjectsController', () => {
     expect(humanSubject?.profile?.pseudonymizedSubjectCode).toBe('HUM-PSEUDO-001');
     expect(humanSubject?.profile?.email).toBeUndefined();
     expect(humanSubject?.profile?.fullName).toBeUndefined();
+
+    const rodentSubject = subjects.find((subject) => subject.profileType === 'rodent');
+
+    expect(
+      rodentSubject?.aggregateMemberships?.map((membership) => membership.aggregateKind),
+    ).toEqual(['batch', 'group', 'cohort']);
   });
 
   it('reads a single subject and returns 404 for a missing subject', async () => {
@@ -65,6 +72,62 @@ describe('SubjectsController', () => {
     const missingResponse = await fetch(`${root}/subjects/not-found`);
 
     expect(missingResponse.status).toBe(404);
+  });
+
+  it('exposes batch, group, and cohort aggregate fixtures', async () => {
+    const root = await baseUrl();
+    const aggregatesResponse = await fetch(`${root}/subject-aggregates`);
+    const aggregates = (await aggregatesResponse.json()) as Array<{
+      readonly id?: string;
+      readonly kind?: string;
+      readonly batch?: { readonly originType?: string };
+      readonly group?: { readonly groupPurpose?: string };
+      readonly cohort?: { readonly cohortKind?: string };
+    }>;
+    const membershipsResponse = await fetch(
+      `${root}/subject-aggregates/cohort-synthetic-mixed/memberships`,
+    );
+    const memberships = (await membershipsResponse.json()) as Array<{
+      readonly subjectId?: string;
+      readonly aggregateKind?: string;
+      readonly role?: string;
+    }>;
+    const subjectMembershipsResponse = await fetch(
+      `${root}/subjects/subject-rodent-001/aggregates`,
+    );
+    const subjectMemberships = (await subjectMembershipsResponse.json()) as Array<{
+      readonly aggregateCode?: string;
+    }>;
+
+    expect(aggregatesResponse.status).toBe(200);
+    expect(aggregates.map((aggregate) => aggregate.kind)).toEqual(
+      expect.arrayContaining(['batch', 'group', 'cohort']),
+    );
+    expect(
+      aggregates.find((aggregate) => aggregate.id === 'batch-zebrafish-spawn-001')?.batch
+        ?.originType,
+    ).toBe('spawn');
+    expect(
+      aggregates.find((aggregate) => aggregate.id === 'group-rodent-cage-a1')?.group?.groupPurpose,
+    ).toBe('housing');
+    expect(
+      aggregates.find((aggregate) => aggregate.id === 'cohort-synthetic-mixed')?.cohort?.cohortKind,
+    ).toBe('interventional_arm');
+    expect(membershipsResponse.status).toBe(200);
+    expect(memberships.map((membership) => membership.subjectId)).toEqual([
+      'subject-rodent-001',
+      'subject-zebrafish-batch-001',
+    ]);
+    expect(memberships.map((membership) => membership.role)).toEqual([
+      'randomized_unit',
+      'randomized_unit',
+    ]);
+    expect(subjectMembershipsResponse.status).toBe(200);
+    expect(subjectMemberships.map((membership) => membership.aggregateCode)).toEqual([
+      'BATCH-ROD-SHIP-001',
+      'GROUP-ROD-CAGE-A1',
+      'COHORT-SYN-MIXED',
+    ]);
   });
 
   it('creates a subject through domain-aligned validation', async () => {

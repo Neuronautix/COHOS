@@ -17,7 +17,8 @@ The current API modules are fixture-backed. The Prisma schema is ready for persi
 The API imports these modules:
 
 - Health: `GET /health`.
-- Subjects: `GET /subjects`, `GET /subjects/:subjectId`, `POST /subjects`.
+- Subjects: `GET /subjects`, `GET /subjects/:subjectId`, `GET /subjects/:subjectId/aggregates`, `POST /subjects`.
+- Subject aggregates: `GET /subject-aggregates`, `GET /subject-aggregates/:aggregateId`, `GET /subject-aggregates/:aggregateId/memberships`.
 - Facilities and housing: `GET /facilities`, `GET /facilities/:facilityId`, `GET /housing-units/:housingUnitId`.
 - Research metadata: vocabulary, investigations, studies, assays, procedures, and connected-resource links.
 - Events: event lists, transfer/mortality/welfare/environmental creation routes, derived subject state, derived housing state, audit events, and alerts.

@@ -1,4 +1,8 @@
-import type { SubjectProfileType, SubjectWithProfile } from '@cohos/domain';
+import type {
+  SubjectAggregateMembership,
+  SubjectProfileType,
+  SubjectWithProfile,
+} from '@cohos/domain';
 import type { StatusTone } from '@cohos/ui';
 
 export type SubjectField = {
@@ -110,6 +114,26 @@ function subjectField(label: string, value: string): SubjectField {
   };
 }
 
+export function getSubjectAggregateMembershipLabel(membership: SubjectAggregateMembership): string {
+  return `${formatToken(membership.aggregateKind)}: ${
+    membership.aggregateCode ?? membership.aggregateId
+  }`;
+}
+
+function getSubjectAggregateFieldValue(subject: SubjectWithProfile): string {
+  const memberships = subject.aggregateMemberships ?? [];
+
+  if (memberships.length === 0) {
+    return 'None';
+  }
+
+  return memberships.map(getSubjectAggregateMembershipLabel).join(', ');
+}
+
+function getSubjectAggregateFields(subject: SubjectWithProfile): SubjectField[] {
+  return [subjectField('Aggregate memberships', getSubjectAggregateFieldValue(subject))];
+}
+
 export function getSubjectProfileFields(subject: SubjectWithProfile): SubjectField[] {
   switch (subject.profile.profileType) {
     case 'human':
@@ -128,6 +152,7 @@ export function getSubjectProfileFields(subject: SubjectWithProfile): SubjectFie
             ? 'Not recorded'
             : formatToken(subject.profile.genderIdentity),
         ),
+        ...getSubjectAggregateFields(subject),
       ];
     case 'rodent':
       return [
@@ -143,6 +168,7 @@ export function getSubjectProfileFields(subject: SubjectWithProfile): SubjectFie
         ),
         subjectField('Housing unit', subject.profile.housingUnitId ?? 'Unassigned'),
         subjectField('Welfare', formatToken(subject.profile.welfareStatus)),
+        ...getSubjectAggregateFields(subject),
       ];
     case 'zebrafish_batch':
       return [
@@ -156,6 +182,7 @@ export function getSubjectProfileFields(subject: SubjectWithProfile): SubjectFie
           'Environmental observations',
           subject.profile.environmentalObservationIds.length.toString(),
         ),
+        ...getSubjectAggregateFields(subject),
       ];
     case 'farm_animal':
       return [
@@ -169,6 +196,7 @@ export function getSubjectProfileFields(subject: SubjectWithProfile): SubjectFie
         subjectField('Sex', formatToken(subject.profile.sex)),
         subjectField('Housing unit', subject.profile.housingUnitId ?? 'Unassigned'),
         subjectField('Welfare', formatToken(subject.profile.welfareStatus)),
+        ...getSubjectAggregateFields(subject),
       ];
     case 'generic':
       return [
@@ -176,6 +204,7 @@ export function getSubjectProfileFields(subject: SubjectWithProfile): SubjectFie
         subjectField('Species', getSubjectSpeciesLabel(subject)),
         subjectField('Metadata fields', Object.keys(subject.profile.metadata).length.toString()),
         subjectField('Notes', subject.profile.extensibilityNotes ?? 'Not recorded'),
+        ...getSubjectAggregateFields(subject),
       ];
   }
 }
@@ -210,6 +239,7 @@ export function matchesSubjectSearch(subject: SubjectWithProfile, searchTerm: st
     subject.status,
     getSubjectSpeciesLabel(subject),
     getSubjectLocationLabel(subject),
+    ...(subject.aggregateMemberships ?? []).map(getSubjectAggregateMembershipLabel),
   ]
     .join(' ')
     .toLowerCase()

@@ -17,6 +17,7 @@ Every subject has:
 - `status`
 - optional `cohortId`
 - optional `speciesId`
+- optional aggregate memberships in `SubjectWithProfile`
 - an embedded profile in `SubjectWithProfile`
 
 Supported profile types:
@@ -28,6 +29,26 @@ Supported profile types:
 - `generic`: optional species, biological type, metadata, and extensibility notes.
 
 Human subject validation requires `subjectCode` to match `profile.pseudonymizedSubjectCode`. Animal species profiles require NCBITaxon identifiers.
+
+## Subject Aggregates
+
+Batch, group, and cohort are modeled as separate `SubjectAggregate` kinds instead of overloading `Subject.cohortId`.
+
+- `batch`: shared-origin, count-bearing biological aggregate. Batch metadata captures origin type, provenance, line/strain/genotype, birth/spawn/hatch/arrival dates, developmental stage, sex composition, counts, count unit, and split/merge event references.
+- `group`: operational or management set. Group metadata captures purpose, housing unit, environmental context, husbandry protocol, diet, density, and membership policy.
+- `cohort`: study-defined analytical population or arm. Cohort metadata captures cohort kind, study, inclusion/exclusion criteria, recruitment source, exposure/intervention, randomization, blinding, planned size, and follow-up schedule.
+
+`SubjectAggregateMembership` links a subject to any aggregate with a role, validity interval, optional count, and metadata. Existing `cohortId` remains available for compatibility with current study links, but new behavior should prefer aggregate memberships.
+
+Recommended aggregate behavior by subject category:
+
+- Human: individual subject unit; cohort is primary; batch/group are optional and should avoid direct identifiers.
+- Rodent: individual subject unit; batch, group, and cohort are all primary for litter/shipment provenance, cage/treatment context, and study allocation.
+- Zebrafish batch: counted-batch subject unit; batch, group, and cohort are all primary for spawn/hatch provenance, tank context, count history, and study allocation.
+- Farm animal: individual or group subject unit; batch, group, and cohort are all primary for birth lot/shipment, herd/flock/pen/pasture membership, and trial allocation.
+- Generic: material subject unit; batch and cohort are primary, group is optional for pooled or operational collections.
+
+This organization is aligned with ARRIVE/PREPARE animal-study reporting, STROBE cohort reporting, ISA investigation/study/assay separation, species/strain nomenclature conventions, zebrafish developmental staging practice, and BioSample-style structured attributes.
 
 ## Facility And Housing
 
