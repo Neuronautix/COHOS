@@ -1,5 +1,8 @@
 # COHOS
 
+> **Project status — development paused / frozen (October 2026).** COHOS is retained as a research prototype and reference implementation, not an active product roadmap. No new feature development is planned unless a concrete scientific use case justifies resuming it. Existing schemas and synthetic demonstrations are not production-ready; the documented authentication, persistence and connector limitations still apply. This is a development freeze, **not** a GitHub archive.
+
+
 COHOS is an open-source TypeScript monorepo for subject operations, research metadata, welfare review, audit trails, QR scan workflows, ISA-like export, and connector preparation.
 
 The MVP is intentionally contract-first. The backend API and shared domain schemas are the source of truth, while the web app reads those contracts and keeps create/update behavior narrow until persistence and authorization are completed.
